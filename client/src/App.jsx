@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import Dashboard from './components/Dashboard';
 import SearchRecovery from './components/SearchRecovery';
 import KnowledgeGraph from './components/KnowledgeGraph';
 import MaterialsList from './components/MaterialsList';
@@ -9,7 +10,7 @@ import Flashcards from './components/Flashcards';
 import ConceptDrawer from './components/ConceptDrawer';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('search');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [summary, setSummary] = useState(null);
   const [healthStatus, setHealthStatus] = useState(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
@@ -71,6 +72,14 @@ export default function App() {
 
       {/* Main Container */}
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+        {activeTab === 'dashboard' && (
+          <Dashboard
+            summary={summary}
+            onNavigate={(tab) => setActiveTab(tab)}
+            onOpenUpload={() => setIsUploadOpen(true)}
+          />
+        )}
+
         {activeTab === 'search' && (
           <SearchRecovery
             currentDomain={currentDomain}

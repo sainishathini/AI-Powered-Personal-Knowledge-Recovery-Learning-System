@@ -212,6 +212,19 @@ Section 3.5: Positional Encoding is added to the input embeddings at the bottoms
       }
     ],
 
+    recentSearches: [
+      { query: 'Where did I learn about Vanishing Gradients?', timestamp: '12 mins ago', match: 'Deep_Learning_Lecture_04_Optimization.pdf', confidence: '98%' },
+      { query: 'Scaled Dot-Product Attention formula', timestamp: '1 hour ago', match: 'Transformers_Self_Attention_Guide.pptx', confidence: '99%' },
+      { query: 'Dying ReLU neuron activation', timestamp: '3 hours ago', match: 'Neural_Network_Architectures_Handwritten_Notes.md', confidence: '91%' },
+      { query: 'ResNet Skip Connections identity mapping', timestamp: 'Yesterday', match: 'Deep_Learning_Lecture_04_Optimization.pdf', confidence: '96%' }
+    ],
+
+    suggestedTopics: [
+      { title: 'Positional Encodings & Sinusoids', category: 'Transformer Architecture', reason: 'Critical Gap Identified (Recall: 40%)', action: 'Review Slide 18' },
+      { title: 'Gradient Clipping & Norm Bounds', category: 'Optimization', reason: 'Unlinked Prerequisite to Adam', action: 'Review Section 4.2' },
+      { title: 'Leaky ReLU Derivative & Dying Neurons', category: 'Activation Functions', reason: 'Weak Connection to Backprop', action: 'Review Page 3' }
+    ],
+
     quizzes: [
       {
         id: 'q-1',
@@ -321,6 +334,16 @@ TLB Miss: Address translation requires walking the page table tree in RAM, causi
         recommendedDoc: 'Distributed_Systems_Lecture_08_CAP_Theorem.pdf (Section 3)',
         suggestedAction: 'Compare Cassandra AP system vs MongoDB CP system configuration.'
       }
+    ],
+
+    recentSearches: [
+      { query: 'Where did I learn about CAP Theorem?', timestamp: '5 mins ago', match: 'Distributed_Systems_Lecture_08_CAP_Theorem.pdf', confidence: '99%' },
+      { query: 'Where was TLB Miss penalty discussed?', timestamp: '40 mins ago', match: 'Virtual_Memory_Paging_TLB_Notes.docx', confidence: '97%' }
+    ],
+
+    suggestedTopics: [
+      { title: 'PACELC Latency Tradeoffs', category: 'Distributed Computing', reason: 'Weak Connection Identified (Mastery: 50%)', action: 'Review Section 3' },
+      { title: 'Multi-Level Page Table Walking', category: 'Memory Management', reason: 'Prerequisite for TLB Miss', action: 'Review Page 4' }
     ],
 
     quizzes: [

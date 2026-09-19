@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu } from 'lucide-react';
+import { Brain, LayoutDashboard, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu } from 'lucide-react';
 
 export default function Header({ 
   activeTab, 
@@ -70,6 +70,18 @@ export default function Header({
       {/* Main Navigation Tabs */}
       <div className="max-w-7xl mx-auto mt-3.5 pt-2 border-t border-white/5 flex items-center justify-between overflow-x-auto">
         <nav className="flex items-center gap-1 sm:gap-2">
+
+          <button
+            onClick={() => setActiveTab('dashboard')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'dashboard'
+                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+            }`}
+          >
+            <LayoutDashboard className="w-4 h-4 text-cyan-400" />
+            <span>Dashboard</span>
+          </button>
           
           <button
             onClick={() => setActiveTab('search')}

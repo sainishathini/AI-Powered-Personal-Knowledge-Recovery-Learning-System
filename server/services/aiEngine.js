@@ -148,7 +148,7 @@ async function recoverKnowledgeOrigin(query) {
       course: 'Core Curriculum'
     };
 
-    return {
+    const resultObj = {
       query,
       found: true,
       primaryResult: {
@@ -173,6 +173,9 @@ async function recoverKnowledgeOrigin(query) {
       })),
       aiInsight: `MemoryMap located "${top.title}" in ${top.sourceDocTitle} (${top.location}). This concept bridges ${top.prerequisites.join(', ')} and ${top.connectedConcepts.join(', ')}.`
     };
+
+    store.addRecentSearch(query, top.sourceDocTitle || parentDoc.title, `${Math.round(resultObj.primaryResult.confidence * 100)}%`);
+    return resultObj;
   }
 
   // Default fallback match if user searches something generic

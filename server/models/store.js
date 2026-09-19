@@ -19,6 +19,8 @@ class MemoryStore {
     this.relationships = JSON.parse(JSON.stringify(raw.relationships || []));
     this.gaps = JSON.parse(JSON.stringify(raw.gaps || []));
     this.quizzes = JSON.parse(JSON.stringify(raw.quizzes || []));
+    this.recentSearches = JSON.parse(JSON.stringify(raw.recentSearches || []));
+    this.suggestedTopics = JSON.parse(JSON.stringify(raw.suggestedTopics || []));
   }
 
   getWorkspaceSummary() {
@@ -28,12 +30,27 @@ class MemoryStore {
         totalMaterials: this.materials.length,
         totalConcepts: this.concepts.length,
         totalRelationships: this.relationships.length,
-        criticalGapsCount: this.gaps.filter(g => g.status === 'CRITICAL_GAP').length,
+        criticalGapsCount: this.gaps.length,
         averageMastery: Math.round(
           this.concepts.reduce((acc, c) => acc + (c.mastery || 50), 0) / (this.concepts.length || 1)
         )
-      }
+      },
+      recentMaterials: this.materials.slice(0, 4),
+      recentSearches: this.recentSearches.slice(0, 5),
+      suggestedTopics: this.suggestedTopics
     };
+  }
+
+  addRecentSearch(query, matchTitle, confidence = '98%') {
+    this.recentSearches.unshift({
+      query,
+      timestamp: 'Just now',
+      match: matchTitle,
+      confidence
+    });
+    if (this.recentSearches.length > 8) {
+      this.recentSearches.pop();
+    }
   }
 
   getAllMaterials() {
@@ -81,11 +98,9 @@ class MemoryStore {
   }
 
   getKnowledgeGraph() {
-    // Generate nodes and edges formatted for React Flow / custom visualization
     const nodes = [];
     const edges = [];
 
-    // Document Nodes (blue/cyan theme)
     this.materials.forEach(doc => {
       nodes.push({
         id: doc.id,
@@ -101,7 +116,6 @@ class MemoryStore {
       });
     });
 
-    // Concept Nodes (violet/emerald theme based on mastery)
     this.concepts.forEach(c => {
       nodes.push({
         id: c.id,
@@ -123,7 +137,6 @@ class MemoryStore {
         position: { x: Math.random() * 700 + 100, y: Math.random() * 500 + 100 }
       });
 
-      // Connect Concept to Source Document
       if (c.sourceDocId) {
         edges.push({
           id: `edge-${c.sourceDocId}-${c.id}`,
@@ -137,7 +150,6 @@ class MemoryStore {
       }
     });
 
-    // Explicit Concept-to-Concept relationships
     this.relationships.forEach((rel, idx) => {
       edges.push({
         id: `rel-${idx}-${rel.source}-${rel.target}`,
