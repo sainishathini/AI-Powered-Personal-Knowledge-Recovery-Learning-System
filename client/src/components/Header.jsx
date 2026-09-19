@@ -9,7 +9,9 @@ export default function Header({
   onOpenUpload,
   onOpenLogin,
   user,
-  healthStatus 
+  healthStatus,
+  isDemoMode,
+  onToggleDemoMode
 }) {
   return (
     <header className="sticky top-0 z-40 glass-panel border-b border-white/10 px-4 lg:px-8 py-3.5">
@@ -57,6 +59,20 @@ export default function Header({
             <Cpu className="w-3.5 h-3.5" />
             <span>{healthStatus?.mode === 'LIVE_LLM' ? 'Live LLM API' : 'Presentation AI'}</span>
           </div>
+
+          {/* Competition Demo Mode Button */}
+          <button
+            onClick={onToggleDemoMode}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm ${
+              isDemoMode
+                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-amber-500/20 animate-pulse'
+                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+            }`}
+            title="Toggle Competition Demo Walkthrough"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+            <span>🎯 Demo Mode</span>
+          </button>
 
           {/* Login / User Avatar */}
           <button

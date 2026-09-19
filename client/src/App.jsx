@@ -13,6 +13,7 @@ import LoginModal from './components/LoginModal';
 import GapAnalyzer from './components/GapAnalyzer';
 import Flashcards from './components/Flashcards';
 import ConceptDrawer from './components/ConceptDrawer';
+import DemoControllerBar from './components/DemoControllerBar';
 
 export default function App() {
   const [viewMode, setViewMode] = useState('app'); // 'landing' or 'app'
@@ -21,9 +22,11 @@ export default function App() {
   const [healthStatus, setHealthStatus] = useState(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isDemoMode, setIsDemoMode] = useState(false);
   const [user, setUser] = useState({ id: 'u-1', name: 'Alex Rivera', email: 'demo@memorymap.com', role: 'CS Student' });
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [currentDomain, setCurrentDomain] = useState('aiml');
+  const [demoSearchQuery, setDemoSearchQuery] = useState('');
 
   useEffect(() => {
     fetchSummary();
@@ -101,10 +104,12 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           user={user}
           healthStatus={healthStatus}
+          isDemoMode={isDemoMode}
+          onToggleDemoMode={() => setIsDemoMode(!isDemoMode)}
         />
 
         {/* Main Content Area */}
-        <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6">
+        <main className="flex-1 max-w-7xl w-full mx-auto px-4 lg:px-8 py-6 pb-24">
           {activeTab === 'dashboard' && (
             <Dashboard
               summary={summary}
@@ -123,6 +128,7 @@ export default function App() {
           {activeTab === 'search' && (
             <SearchRecovery
               currentDomain={currentDomain}
+              initialQuery={demoSearchQuery}
               onSelectConcept={(concept) => setSelectedConcept(concept)}
               onNavigate={(tab) => setActiveTab(tab)}
             />
@@ -211,6 +217,19 @@ export default function App() {
         concept={selectedConcept}
         onClose={() => setSelectedConcept(null)}
       />
+
+      {/* Competition Demo Mode Controller Bar */}
+      {isDemoMode && (
+        <DemoControllerBar
+          activeTab={activeTab}
+          setActiveTab={setActiveTab}
+          onRunDemoQuery={(query) => {
+            setDemoSearchQuery(query);
+            setActiveTab('search');
+          }}
+          onClose={() => setIsDemoMode(false)}
+        />
+      )}
 
     </div>
   );

@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, FileText, Bookmark, ArrowRight, ShieldCheck, HelpCircle, Layers, Link as LinkIcon, Compass, CheckCircle2, Network } from 'lucide-react';
 
-export default function SearchRecovery({ onSelectConcept, currentDomain, onNavigate }) {
+export default function SearchRecovery({ onSelectConcept, currentDomain, onNavigate, initialQuery }) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
 
   const sampleQueries = [
     'Where did I learn about HashSet?',
-    'Where did I learn about Vanishing Gradients?',
-    'What source explains Recursion and trees?',
-    'Where is Database Normalization defined?',
-    'How does Scaled Dot Product Attention work?'
+    'What did I learn about Java Collections?',
+    'Show my notes about duplicate removal.',
+    'What is related to ArrayList?',
+    'What should I learn next about HashMap?'
   ];
 
   const handleSearch = async (searchQuery) => {
     const q = searchQuery || query;
     if (!q.trim()) return;
 
+    setQuery(q);
     setLoading(true);
     setResult(null);
 
@@ -36,10 +37,13 @@ export default function SearchRecovery({ onSelectConcept, currentDomain, onNavig
     }
   };
 
-  // Perform initial demo search on mount (Step 2: "Where did I learn about HashSet?")
   useEffect(() => {
-    handleSearch(sampleQueries[0]);
-  }, [currentDomain]);
+    if (initialQuery) {
+      handleSearch(initialQuery);
+    } else {
+      handleSearch(sampleQueries[0]);
+    }
+  }, [initialQuery, currentDomain]);
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
