@@ -98,6 +98,7 @@ export default function App() {
         {activeTab === 'graph' && (
           <KnowledgeGraph
             onSelectConcept={(concept) => setSelectedConcept(concept)}
+            onNavigate={(tab) => setActiveTab(tab)}
           />
         )}
 
