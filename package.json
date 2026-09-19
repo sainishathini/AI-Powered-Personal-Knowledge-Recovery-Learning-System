@@ -1,0 +1,11 @@
+{
+  "name": "memorymap-root",
+  "version": "1.0.0",
+  "description": "MemoryMap — AI-Powered Personal Knowledge Recovery & Learning System",
+  "scripts": {
+    "install:all": "npm install --prefix server && npm install --prefix client",
+    "start:server": "node server/index.js",
+    "start:client": "npm run dev --prefix client",
+    "dev": "node server/index.js"
+  }
+}
