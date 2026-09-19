@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, LayoutDashboard, PlusCircle, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu, Compass } from 'lucide-react';
+import { Brain, LayoutDashboard, PlusCircle, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu, Compass, User } from 'lucide-react';
 
 export default function Header({ 
   activeTab, 
@@ -7,6 +7,8 @@ export default function Header({
   summary, 
   onSwitchWorkspace, 
   onOpenUpload,
+  onOpenLogin,
+  user,
   healthStatus 
 }) {
   return (
@@ -56,6 +58,16 @@ export default function Header({
             <span>{healthStatus?.mode === 'LIVE_LLM' ? 'Live LLM API' : 'Presentation AI'}</span>
           </div>
 
+          {/* Login / User Avatar */}
+          <button
+            onClick={onOpenLogin}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-indigo-500/40 text-xs text-slate-200 font-semibold transition-all"
+            title="Demo Account Login"
+          >
+            <User className="w-3.5 h-3.5 text-indigo-400" />
+            <span>{user ? user.name : 'Demo Login'}</span>
+          </button>
+
           {/* Add Knowledge Header Button */}
           <button
             onClick={() => setActiveTab('add_knowledge')}
@@ -104,7 +116,7 @@ export default function Header({
             }`}
           >
             <Search className="w-4 h-4 text-indigo-400" />
-            <span>Knowledge Recovery</span>
+            <span>Ask My Knowledge</span>
           </button>
 
           <button
@@ -140,7 +152,7 @@ export default function Header({
             }`}
           >
             <BookOpen className="w-4 h-4 text-cyan-400" />
-            <span>Study Materials</span>
+            <span>Resources</span>
             {summary?.stats?.totalMaterials > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-bold">
                 {summary.stats.totalMaterials}

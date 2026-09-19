@@ -9,6 +9,7 @@ import KnowledgeGraph from './components/KnowledgeGraph';
 import ConceptExplorer from './components/ConceptExplorer';
 import MaterialsList from './components/MaterialsList';
 import UploadModal from './components/UploadModal';
+import LoginModal from './components/LoginModal';
 import GapAnalyzer from './components/GapAnalyzer';
 import Flashcards from './components/Flashcards';
 import ConceptDrawer from './components/ConceptDrawer';
@@ -19,6 +20,8 @@ export default function App() {
   const [summary, setSummary] = useState(null);
   const [healthStatus, setHealthStatus] = useState(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [user, setUser] = useState({ id: 'u-1', name: 'Alex Rivera', email: 'demo@memorymap.com', role: 'CS Student' });
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [currentDomain, setCurrentDomain] = useState('aiml');
 
@@ -88,13 +91,15 @@ export default function App() {
       {/* Main Content Workspace */}
       <div className="flex-1 flex flex-col min-w-0 min-h-screen overflow-y-auto">
         
-        {/* Top Header Navigation (Mobile & Quick Actions) */}
+        {/* Top Header Navigation */}
         <Header
           activeTab={activeTab}
           setActiveTab={setActiveTab}
           summary={summary}
           onSwitchWorkspace={handleSwitchWorkspace}
           onOpenUpload={() => setIsUploadOpen(true)}
+          onOpenLogin={() => setIsLoginOpen(true)}
+          user={user}
           healthStatus={healthStatus}
         />
 
@@ -166,8 +171,12 @@ export default function App() {
                   <span className="font-bold text-indigo-300">Local High-Dimensional Index</span>
                 </div>
                 <div className="flex justify-between items-center">
+                  <span>Active User Account:</span>
+                  <span className="font-bold text-cyan-300">{user?.name} ({user?.email})</span>
+                </div>
+                <div className="flex justify-between items-center">
                   <span>Preloaded Knowledge Domains:</span>
-                  <span className="font-bold text-cyan-300">Java Collections, Data Structures, DBMS, Deep Learning</span>
+                  <span className="font-bold text-purple-300">Java Collections, Data Structures, DBMS, Deep Learning</span>
                 </div>
               </div>
             </div>
@@ -188,6 +197,13 @@ export default function App() {
         onRefresh={() => {
           fetchSummary();
         }}
+      />
+
+      {/* Login Modal */}
+      <LoginModal
+        isOpen={isLoginOpen}
+        onClose={() => setIsLoginOpen(false)}
+        onLoginSuccess={(loggedUser) => setUser(loggedUser)}
       />
 
       {/* Concept Drawer */}
