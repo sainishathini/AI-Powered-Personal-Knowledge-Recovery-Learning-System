@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Brain, Network, AlertTriangle, Search, Plus, Sparkles, Clock, ArrowRight, FileText, CheckCircle2, ChevronRight, Compass } from 'lucide-react';
+import { BookOpen, Brain, Network, AlertTriangle, Search, Plus, Sparkles, Clock, ArrowRight, FileText, CheckCircle2, ChevronRight, Compass, RotateCcw } from 'lucide-react';
 
 export default function Dashboard({ summary, onNavigate, onOpenUpload, onSearchQuery }) {
   const stats = summary?.stats || {};
@@ -11,23 +11,28 @@ export default function Dashboard({ summary, onNavigate, onOpenUpload, onSearchQ
   const displayGaps = stats.criticalGapsCount > 2 ? stats.criticalGapsCount : 7;
 
   const recentMaterials = summary?.recentMaterials || [
-    { id: 'd1', title: 'Deep_Learning_Lecture_04_Optimization.pdf', type: 'PDF', course: 'CS701 - Deep Learning', dateAdded: 'Today' },
-    { id: 'd2', title: 'Transformers_Self_Attention_Guide.pptx', type: 'PPT', course: 'CS705 - NLP', dateAdded: 'Yesterday' },
-    { id: 'd3', title: 'Neural_Network_Architectures_Notes.md', type: 'Notes', course: 'CS701 - Deep Learning', dateAdded: '3 days ago' },
-    { id: 'd4', title: 'https://arxiv.org/abs/1706.03762_Attention', type: 'Web', course: 'Research Literature', dateAdded: '5 days ago' }
+    { id: 'd1', title: 'Java Collections.pdf', type: 'PDF', course: 'CS201 - Data Structures', dateAdded: 'Today' },
+    { id: 'd2', title: 'Deep_Learning_Lecture_04_Optimization.pdf', type: 'PDF', course: 'CS701 - Deep Learning', dateAdded: 'Yesterday' },
+    { id: 'd3', title: 'Transformers_Self_Attention_Guide.pptx', type: 'PPT', course: 'CS705 - NLP', dateAdded: '3 days ago' },
+    { id: 'd4', title: 'Data Structures Notes.md', type: 'Notes', course: 'CS201 - Data Structures', dateAdded: '5 days ago' }
   ];
 
   const recentSearches = summary?.recentSearches || [
     { query: 'Where did I learn about Vanishing Gradients?', timestamp: '12 mins ago', match: 'Deep_Learning_Lecture_04_Optimization.pdf', confidence: '98%' },
-    { query: 'Scaled Dot-Product Attention formula', timestamp: '1 hour ago', match: 'Transformers_Self_Attention_Guide.pptx', confidence: '99%' },
-    { query: 'Dying ReLU neuron activation', timestamp: '3 hours ago', match: 'Neural_Network_Architectures_Handwritten_Notes.md', confidence: '91%' },
-    { query: 'ResNet Skip Connections identity mapping', timestamp: 'Yesterday', match: 'Deep_Learning_Lecture_04_Optimization.pdf', confidence: '96%' }
+    { query: 'HashSet duplicate removal', timestamp: '1 hour ago', match: 'Java Collections.pdf', confidence: '99%' }
   ];
 
   const suggestedTopics = summary?.suggestedTopics || [
-    { title: 'Positional Encodings & Sinusoids', category: 'Transformer Architecture', reason: 'Critical Gap (Recall: 40%)', action: 'Review Slide 18' },
-    { title: 'Gradient Clipping & Norm Bounds', category: 'Optimization', reason: 'Unlinked Prerequisite to Adam', action: 'Review Section 4.2' },
-    { title: 'Leaky ReLU Derivative & Dying Neurons', category: 'Activation Functions', reason: 'Weak Connection to Backprop', action: 'Review Page 3' }
+    { title: 'Hashing & Collision Handling', category: 'Java Collections', reason: 'Feature E Learning Gap (75% Progress)', action: 'Learn Next' },
+    { title: 'Sinusoidal Frequency Scaling', category: 'Attention Mechanisms', reason: 'Critical Gap Identified (40% Progress)', action: 'Learn Next' }
+  ];
+
+  // Feature H: Recently Recovered Knowledge
+  const recentRecoveredMemory = summary?.recentRecoveredMemory || [
+    { concept: 'HashSet', recoveredFrom: 'Java Collections.pdf', timestamp: '10 mins ago' },
+    { concept: 'Recursion', recoveredFrom: 'Data Structures Notes.md', timestamp: '45 mins ago' },
+    { concept: 'Normalization', recoveredFrom: 'DBMS PPT.pptx', timestamp: '2 hours ago' },
+    { concept: 'Vanishing Gradients', recoveredFrom: 'Deep_Learning_Lecture_04_Optimization.pdf', timestamp: 'Yesterday' }
   ];
 
   return (
@@ -154,6 +159,44 @@ export default function Dashboard({ summary, onNavigate, onOpenUpload, onSearchQ
           </div>
         </div>
 
+      </div>
+
+      {/* FEATURE H — RECENT MEMORY: Recently Recovered Knowledge Section */}
+      <div className="glass-panel p-6 rounded-2xl border border-indigo-500/30 space-y-4">
+        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+          <div className="flex items-center gap-2">
+            <RotateCcw className="w-5 h-5 text-indigo-400" />
+            <h3 className="text-base font-bold text-white font-sans">Recently Recovered Knowledge</h3>
+          </div>
+          <button
+            onClick={() => onNavigate('search')}
+            className="text-xs text-indigo-300 hover:text-white font-semibold"
+          >
+            Origin Search Engine →
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {recentRecoveredMemory.map((mem, idx) => (
+            <div
+              key={idx}
+              onClick={() => onNavigate('search')}
+              className="bg-slate-900/90 border border-slate-800 rounded-xl p-4 space-y-2 hover:border-indigo-500/40 cursor-pointer transition-all group"
+            >
+              <div className="flex items-center justify-between text-xs">
+                <span className="font-extrabold text-white group-hover:text-indigo-300 transition-colors">
+                  “{mem.concept}”
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono">{mem.timestamp}</span>
+              </div>
+
+              <div className="text-[11px] text-slate-400 flex items-center gap-1.5 pt-1 border-t border-white/5">
+                <FileText className="w-3.5 h-3.5 text-cyan-400 shrink-0" />
+                <span className="truncate">Recovered from <strong className="text-slate-200">{mem.recoveredFrom}</strong></span>
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Main Grid: Recent Searches + Suggested Learning Topics */}

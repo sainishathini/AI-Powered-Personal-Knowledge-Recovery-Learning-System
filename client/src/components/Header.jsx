@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, LayoutDashboard, PlusCircle, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu } from 'lucide-react';
+import { Brain, LayoutDashboard, PlusCircle, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu, Compass } from 'lucide-react';
 
 export default function Header({ 
   activeTab, 
@@ -120,6 +120,18 @@ export default function Header({
           </button>
 
           <button
+            onClick={() => setActiveTab('explorer')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'explorer'
+                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+            }`}
+          >
+            <Compass className="w-4 h-4 text-blue-400" />
+            <span>Concept Explorer</span>
+          </button>
+
+          <button
             onClick={() => setActiveTab('materials')}
             className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
               activeTab === 'materials'
@@ -145,7 +157,7 @@ export default function Header({
             }`}
           >
             <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span>Gap Analysis & Quizzes</span>
+            <span>Learning Gaps</span>
             {summary?.stats?.criticalGapsCount > 0 && (
               <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
                 {summary.stats.criticalGapsCount}

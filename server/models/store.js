@@ -21,6 +21,7 @@ class MemoryStore {
     this.quizzes = JSON.parse(JSON.stringify(raw.quizzes || []));
     this.recentSearches = JSON.parse(JSON.stringify(raw.recentSearches || []));
     this.suggestedTopics = JSON.parse(JSON.stringify(raw.suggestedTopics || []));
+    this.recentRecoveredMemory = JSON.parse(JSON.stringify(raw.recentRecoveredMemory || []));
   }
 
   getWorkspaceSummary() {
@@ -37,7 +38,8 @@ class MemoryStore {
       },
       recentMaterials: this.materials.slice(0, 4),
       recentSearches: this.recentSearches.slice(0, 5),
-      suggestedTopics: this.suggestedTopics
+      suggestedTopics: this.suggestedTopics,
+      recentRecoveredMemory: this.recentRecoveredMemory
     };
   }
 

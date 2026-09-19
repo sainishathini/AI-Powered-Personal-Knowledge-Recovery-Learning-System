@@ -4,6 +4,7 @@ import Dashboard from './components/Dashboard';
 import AddKnowledge from './components/AddKnowledge';
 import SearchRecovery from './components/SearchRecovery';
 import KnowledgeGraph from './components/KnowledgeGraph';
+import ConceptExplorer from './components/ConceptExplorer';
 import MaterialsList from './components/MaterialsList';
 import UploadModal from './components/UploadModal';
 import GapAnalyzer from './components/GapAnalyzer';
@@ -102,14 +103,23 @@ export default function App() {
           />
         )}
 
+        {activeTab === 'explorer' && (
+          <ConceptExplorer
+            onNavigate={(tab) => setActiveTab(tab)}
+          />
+        )}
+
         {activeTab === 'materials' && (
           <MaterialsList
             onOpenUpload={() => setIsUploadOpen(true)}
+            onNavigate={(tab) => setActiveTab(tab)}
           />
         )}
 
         {activeTab === 'gaps' && (
-          <GapAnalyzer />
+          <GapAnalyzer
+            onNavigate={(tab) => setActiveTab(tab)}
+          />
         )}
 
         {activeTab === 'flashcards' && (
