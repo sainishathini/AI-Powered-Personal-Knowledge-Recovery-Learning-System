@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
 import Dashboard from './components/Dashboard';
+import AddKnowledge from './components/AddKnowledge';
 import SearchRecovery from './components/SearchRecovery';
 import KnowledgeGraph from './components/KnowledgeGraph';
 import MaterialsList from './components/MaterialsList';
@@ -77,6 +78,13 @@ export default function App() {
             summary={summary}
             onNavigate={(tab) => setActiveTab(tab)}
             onOpenUpload={() => setIsUploadOpen(true)}
+          />
+        )}
+
+        {activeTab === 'add_knowledge' && (
+          <AddKnowledge
+            onNavigate={(tab) => setActiveTab(tab)}
+            onRefresh={() => fetchSummary()}
           />
         )}
 

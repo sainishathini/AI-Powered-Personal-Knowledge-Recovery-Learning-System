@@ -1,5 +1,5 @@
 import React from 'react';
-import { Brain, LayoutDashboard, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu } from 'lucide-react';
+import { Brain, LayoutDashboard, PlusCircle, Search, Network, BookOpen, AlertTriangle, Sparkles, Plus, Database, Cpu } from 'lucide-react';
 
 export default function Header({ 
   activeTab, 
@@ -56,13 +56,13 @@ export default function Header({
             <span>{healthStatus?.mode === 'LIVE_LLM' ? 'Live LLM API' : 'Presentation AI'}</span>
           </div>
 
-          {/* Upload Button */}
+          {/* Add Knowledge Header Button */}
           <button
-            onClick={onOpenUpload}
+            onClick={() => setActiveTab('add_knowledge')}
             className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-semibold shadow-md shadow-indigo-600/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
           >
-            <Plus className="w-4 h-4" />
-            <span>Ingest Material</span>
+            <PlusCircle className="w-4 h-4" />
+            <span>Add Knowledge</span>
           </button>
         </div>
       </div>
@@ -81,6 +81,18 @@ export default function Header({
           >
             <LayoutDashboard className="w-4 h-4 text-cyan-400" />
             <span>Dashboard</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('add_knowledge')}
+            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
+              activeTab === 'add_knowledge'
+                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
+                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
+            }`}
+          >
+            <PlusCircle className="w-4 h-4 text-emerald-400" />
+            <span>Add Knowledge</span>
           </button>
           
           <button

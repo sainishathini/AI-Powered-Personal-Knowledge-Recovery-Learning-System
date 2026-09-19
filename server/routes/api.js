@@ -36,10 +36,16 @@ router.post('/materials/upload', async (req, res) => {
     const newDoc = store.addMaterial({ title, content, type, course, author });
 
     // AI Concept Extraction
-    const extractedConcepts = await extractConceptsFromMaterial(newDoc.title, newDoc.content);
+    const extractionResult = await extractConceptsFromMaterial(newDoc.title, newDoc.content);
+    
+    // Support both direct array and result object
+    const rawConcepts = Array.isArray(extractionResult) ? extractionResult : (extractionResult.concepts || []);
+    const keywords = extractionResult.keywords || rawConcepts.map(c => c.title);
+    const summaryText = extractionResult.summary || `Indexed ${rawConcepts.length} concepts from ${newDoc.title}.`;
+    const relatedConcepts = extractionResult.relatedConcepts || [...new Set(rawConcepts.flatMap(c => c.connectedConcepts || []))];
 
     // Formally attach source doc ID to concepts
-    const formattedConcepts = extractedConcepts.map(c => ({
+    const formattedConcepts = rawConcepts.map(c => ({
       ...c,
       sourceDocId: newDoc.id,
       sourceDocTitle: newDoc.title
@@ -51,7 +57,16 @@ router.post('/materials/upload', async (req, res) => {
       message: 'Material ingested and concepts mapped successfully!',
       material: newDoc,
       extractedCount: formattedConcepts.length,
-      concepts: formattedConcepts
+      concepts: formattedConcepts,
+      keywords,
+      summary: summaryText,
+      relatedConcepts,
+      sourceInfo: extractionResult.sourceInfo || {
+        title: newDoc.title,
+        type: newDoc.type,
+        size: newDoc.size,
+        dateExtracted: newDoc.dateAdded
+      }
     });
   } catch (err) {
     console.error('Error in material upload:', err);
