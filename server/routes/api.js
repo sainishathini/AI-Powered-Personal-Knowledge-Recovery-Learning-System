@@ -31,10 +31,28 @@ router.get('/drive/status', (req, res) => {
   res.json(driveService.getDriveStatus());
 });
 
-// POST /api/drive/disconnect - Disconnect Google Drive
+// POST /api/drive/disconnect - Disconnect Google Drive (Section 17)
 router.post('/drive/disconnect', (req, res) => {
-  const status = driveService.disconnectGoogleDrive();
-  res.json({ success: true, status });
+  const result = driveService.disconnectGoogleDrive();
+  res.json(result);
+});
+
+// POST /api/drive/auto-sync - Toggle automatic sync setting (Section 16)
+router.post('/drive/auto-sync', (req, res) => {
+  const { enabled } = req.body;
+  const session = driveService.setAutoSync(enabled);
+  res.json({ success: true, autoSync: session.autoSync, session });
+});
+
+// POST /api/drive/sync-now - Trigger immediate re-sync
+router.post('/drive/sync-now', async (req, res) => {
+  try {
+    const { folderId } = req.body;
+    const result = await driveService.ingestGoogleDriveFolder(folderId || 'folder-college-1');
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to sync Google Drive folder' });
+  }
 });
 
 // GET /api/drive/folders - List Google Drive learning folders

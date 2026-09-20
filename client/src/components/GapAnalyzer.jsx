@@ -101,7 +101,7 @@ export default function GapAnalyzer({ onNavigate }) {
                 
                 {/* Header Title & Progress % */}
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-bold text-white font-sans">{item.concept || item.topic}</h3>
+                  <h3 className="text-lg font-black text-white font-sans uppercase tracking-tight">{item.concept || item.topic}</h3>
                   <span className={`text-xs font-extrabold px-2.5 py-0.5 rounded-full border ${
                     item.progress >= 70 
                       ? 'bg-purple-500/20 text-purple-300 border-purple-500/30'
@@ -109,29 +109,31 @@ export default function GapAnalyzer({ onNavigate }) {
                         ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                         : 'bg-red-500/20 text-red-300 border-red-500/30'
                   }`}>
-                    Progress: {item.progress}%
+                    {item.progress}%
                   </span>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="w-full bg-slate-900 h-2.5 rounded-full overflow-hidden border border-slate-800">
-                  <div
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      item.progress >= 70 ? 'bg-gradient-to-r from-indigo-500 to-purple-500' :
-                      item.progress >= 50 ? 'bg-gradient-to-r from-amber-500 to-orange-500' :
-                      'bg-gradient-to-r from-red-600 to-pink-600'
-                    }`}
-                    style={{ width: `${item.progress}%` }}
-                  />
+                {/* Section 15: Learning Coverage Progress Bar */}
+                <div className="space-y-1">
+                  <div className="flex justify-between text-[11px] text-slate-400 font-semibold">
+                    <span>Learning Coverage</span>
+                    <span className="text-purple-300 font-bold">{item.progress}%</span>
+                  </div>
+                  <div className="w-full bg-slate-900 h-3 rounded-full overflow-hidden border border-slate-800 p-0.5">
+                    <div
+                      className="bg-gradient-to-r from-indigo-500 via-purple-500 to-amber-400 h-full rounded-full transition-all duration-500"
+                      style={{ width: `${item.progress}%` }}
+                    />
+                  </div>
                 </div>
 
                 {/* Covered Checkmarks list */}
                 <div className="space-y-1.5 pt-1">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Covered Topics</span>
+                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Covered Concepts</span>
                   <div className="space-y-1">
                     {item.covered?.map((cov, i) => (
                       <div key={i} className="text-xs text-emerald-300 font-medium flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0 stroke-[3]" />
+                        <span className="text-emerald-400 font-bold">✓</span>
                         <span>{cov}</span>
                       </div>
                     ))}
@@ -140,11 +142,11 @@ export default function GapAnalyzer({ onNavigate }) {
 
                 {/* Missing Warnings list */}
                 <div className="space-y-1.5 pt-1">
-                  <span className="text-[10px] font-bold text-amber-400/80 uppercase tracking-wider">Gaps to Cover</span>
+                  <span className="text-[10px] font-bold text-amber-400/80 uppercase tracking-wider">Identified Gaps</span>
                   <div className="space-y-1">
                     {item.missing?.map((mis, i) => (
-                      <div key={i} className="text-xs text-amber-200 font-medium flex items-center gap-1.5">
-                        <AlertCircle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <div key={i} className="text-xs text-amber-300 font-medium flex items-center gap-1.5">
+                        <span className="text-amber-400 font-bold">⚠</span>
                         <span>{mis}</span>
                       </div>
                     ))}

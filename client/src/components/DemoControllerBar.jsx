@@ -13,47 +13,92 @@ export default function DemoControllerBar({
   const steps = [
     {
       id: 1,
-      title: 'Step 1: Dashboard Overview',
+      title: 'Step 1: Open Dashboard',
       tab: 'dashboard',
-      description: 'Showing 146 stored concepts, 24 learning resources, and recovered memory feed.',
-      actionLabel: 'View Dashboard Metrics',
+      description: 'Displaying primary CTA: 🔗 Connect Google Drive.',
+      actionLabel: 'View Dashboard',
       icon: LayoutDashboard,
       color: 'text-cyan-400'
     },
     {
       id: 2,
-      title: 'Step 2: Natural Language Q&A',
+      title: 'Step 2: Connect Google Drive',
+      tab: 'dashboard',
+      description: 'Opening OAuth permission screen & privacy safeguards.',
+      actionLabel: 'Open Drive Connection',
+      icon: Sparkles,
+      color: 'text-indigo-400'
+    },
+    {
+      id: 3,
+      title: 'Step 3: Select 📁 College Folder',
+      tab: 'dashboard',
+      description: 'Selecting College learning folder containing 24 study materials.',
+      actionLabel: 'Select Folder',
+      icon: LayoutDashboard,
+      color: 'text-indigo-400'
+    },
+    {
+      id: 4,
+      title: 'Step 4: Sync Knowledge (24 Found)',
+      tab: 'dashboard',
+      description: 'Showing 24 resources found and clicking Sync Knowledge.',
+      actionLabel: 'Sync Knowledge',
+      icon: RefreshCw,
+      color: 'text-cyan-400'
+    },
+    {
+      id: 5,
+      title: 'Step 5: Multi-Stage Processing',
+      tab: 'dashboard',
+      description: 'Extracting... Identifying concepts... Finding relationships... Updating map.',
+      actionLabel: 'View Ingestion Pipeline',
+      icon: Sparkles,
+      color: 'text-purple-400'
+    },
+    {
+      id: 6,
+      title: 'Step 6: Sync Result (24 / 86 / 42 / 7)',
+      tab: 'dashboard',
+      description: 'Result: 24 resources, 86 concepts, 42 connections, 7 learning gaps.',
+      actionLabel: 'View Sync Summary',
+      icon: CheckCircle2,
+      color: 'text-emerald-400'
+    },
+    {
+      id: 7,
+      title: 'Step 7: Ask My Knowledge',
       tab: 'search',
-      description: 'Querying: "Where did I learn about HashSet?" to test AI recovery engine.',
-      actionLabel: 'Execute HashSet Query',
+      description: 'Asking: "Where did I learn about HashSet?"',
+      actionLabel: 'Ask HashSet Query',
       icon: Search,
       color: 'text-indigo-400',
       action: () => onRunDemoQuery('Where did I learn about HashSet?')
     },
     {
-      id: 3,
-      title: 'Step 3: Exact Citation & Quote',
+      id: 8,
+      title: 'Step 8: Citation & Excerpt',
       tab: 'search',
-      description: 'Attributing: Java Collections.pdf — Page 12 (99% confidence match).',
-      actionLabel: 'Highlight Citation & Excerpt',
+      description: 'Result: Java Collections.pdf — Page 12 (99% confidence match).',
+      actionLabel: 'Inspect Citation',
       icon: Award,
       color: 'text-purple-400'
     },
     {
-      id: 4,
-      title: 'Step 4: Visual Knowledge Map',
+      id: 9,
+      title: 'Step 9: View Knowledge Map',
       tab: 'graph',
-      description: 'Visualizing topology: Java → Collections → ArrayList / HashSet / HashMap.',
-      actionLabel: 'Inspect Graph Topology',
+      description: 'Path: Java → Collections → HashSet → Duplicate Removal.',
+      actionLabel: 'View Knowledge Graph',
       icon: Network,
       color: 'text-emerald-400'
     },
     {
-      id: 5,
-      title: 'Step 5: Learning Gap Diagnostic',
+      id: 10,
+      title: 'Step 10: Learning Gaps (HashMap 75%)',
       tab: 'gaps',
-      description: 'Detecting HashMap gap: 75% complete (Missing: Collision handling, Hashing mechanism).',
-      actionLabel: 'Show HashMap Learning Gap',
+      description: 'HashMap — 75% (Missing: Collision handling, Hashing mechanism).',
+      actionLabel: 'Inspect Learning Gap',
       icon: AlertTriangle,
       color: 'text-amber-400'
     }

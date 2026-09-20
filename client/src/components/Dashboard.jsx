@@ -96,12 +96,15 @@ export default function Dashboard({ summary, onNavigate, onOpenUpload, onOpenDri
               </span>
             </div>
 
-            <button
-              onClick={onOpenUpload}
-              className="text-slate-400 hover:text-white font-semibold flex items-center gap-1 shrink-0 underline text-[11px]"
-            >
-              Manual file upload fallback →
-            </button>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="text-[10px] text-slate-500 uppercase font-bold">Secondary Action:</span>
+              <button
+                onClick={onOpenUpload}
+                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all flex items-center gap-1.5"
+              >
+                <span>📄 Add Individual Resource</span>
+              </button>
+            </div>
           </div>
 
         </div>

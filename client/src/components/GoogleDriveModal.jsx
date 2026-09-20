@@ -1,43 +1,56 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Folder, 
-  FolderCheck, 
   ShieldCheck, 
   CheckCircle2, 
   Sparkles, 
   FileText, 
   ArrowRight, 
   RefreshCw, 
-  Lock, 
-  ExternalLink,
-  Layers,
-  Network,
-  BookOpen
+  BookOpen,
+  Power,
+  RotateCcw,
+  AlertCircle
 } from 'lucide-react';
 
 export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete }) {
-  // Connection steps:
-  // 'initial' = Connect Learning Space screen
-  // 'connected' = Choose learning folder screen
-  // 'syncing' = Processing multi-step AI ingestion pipeline
-  // 'completed' = Ingestion summary
+  // Steps: 'initial', 'connected', 'syncing', 'completed'
   const [step, setStep] = useState('initial');
   const [folders, setFolders] = useState([]);
   const [selectedFolderId, setSelectedFolderId] = useState('folder-college-1');
   const [selectedFolderFiles, setSelectedFolderFiles] = useState([]);
-  const [loadingFolders, setLoadingFolders] = useState(false);
   const [syncingProgress, setSyncingProgress] = useState(1);
   const [ingestResult, setIngestResult] = useState(null);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
+  const [autoSyncEnabled, setAutoSyncEnabled] = useState(true);
+  const [showDisconnectConfirm, setShowDisconnectConfirm] = useState(false);
+  const [disconnectNotice, setDisconnectNotice] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
       fetchFolders();
+      fetchStatus();
     }
   }, [isOpen]);
 
+  const fetchStatus = async () => {
+    try {
+      const res = await fetch('/api/drive/status');
+      if (res.ok) {
+        const status = await res.json();
+        if (status.isConnected) {
+          setStep('connected');
+          if (status.autoSync !== undefined) {
+            setAutoSyncEnabled(status.autoSync);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch Drive status:', err);
+    }
+  };
+
   const fetchFolders = async () => {
-    setLoadingFolders(true);
     try {
       const res = await fetch('/api/drive/folders');
       if (res.ok) {
@@ -50,8 +63,6 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
       }
     } catch (err) {
       console.error('Failed to fetch Drive folders:', err);
-    } finally {
-      setLoadingFolders(false);
     }
   };
 
@@ -69,7 +80,7 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
 
   if (!isOpen) return null;
 
-  // Step 1 -> Step 2: Handle OAuth connection
+  // OAuth Authentication Action
   const handleAuthenticate = async () => {
     setIsAuthenticating(true);
     try {
@@ -85,7 +96,7 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
         setTimeout(() => {
           setIsAuthenticating(false);
           setStep('connected');
-        }, 800);
+        }, 700);
       }
     } catch (err) {
       console.error('Auth error:', err);
@@ -93,12 +104,11 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
     }
   };
 
-  // Step 2 -> Step 3: Handle Folder Ingestion
-  const handleIngestFolder = async () => {
+  // Sync Knowledge Action (Step 4 & 5)
+  const handleSyncKnowledge = async () => {
     setStep('syncing');
     setSyncingProgress(1);
 
-    // Step animation interval
     const interval = setInterval(() => {
       setSyncingProgress(prev => {
         if (prev < 5) return prev + 1;
@@ -132,10 +142,33 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
     }
   };
 
-  const handleReset = () => {
-    setStep('initial');
-    setSyncingProgress(1);
-    setIngestResult(null);
+  // Auto Sync Toggle Handler (Section 16)
+  const handleToggleAutoSync = async () => {
+    const nextVal = !autoSyncEnabled;
+    setAutoSyncEnabled(nextVal);
+    try {
+      await fetch('/api/drive/auto-sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ enabled: nextVal })
+      });
+    } catch (err) {
+      console.error('Failed to toggle auto sync:', err);
+    }
+  };
+
+  // Disconnect Google Drive Handler (Section 17)
+  const handleDisconnectDrive = async () => {
+    try {
+      const res = await fetch('/api/drive/disconnect', { method: 'POST' });
+      const data = await res.json();
+      setDisconnectNotice(data.message || 'Google Drive disconnected.');
+      setShowDisconnectConfirm(false);
+      setStep('initial');
+      if (onIngestionComplete) onIngestionComplete();
+    } catch (err) {
+      console.error('Failed to disconnect Google Drive:', err);
+    }
   };
 
   const selectedFolder = folders.find(f => f.id === selectedFolderId);
@@ -166,29 +199,33 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
               <h2 className="text-xl sm:text-2xl font-black text-white uppercase tracking-tight font-sans">
                 CONNECT YOUR LEARNING SPACE
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-300 max-w-md mx-auto leading-relaxed font-medium">
                 MemoryMap will use the learning folder you choose to build your personal knowledge map.
               </p>
             </div>
 
-            {/* Permission Assurances Box */}
+            {/* SECTION 18: PRIVACY / TRUST UI ("YOUR DATA, YOUR CONTROL") */}
             <div className="bg-slate-900/90 border border-indigo-500/30 p-5 rounded-2xl text-left space-y-3 shadow-inner">
-              <div className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Secure Google OAuth 2.0 Access
+              <div className="text-xs font-black text-indigo-300 uppercase tracking-wider flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" /> YOUR DATA, YOUR CONTROL
               </div>
 
-              <ul className="space-y-2.5 text-xs text-slate-300">
+              <ul className="space-y-2 text-xs text-slate-300">
                 <li className="flex items-center gap-2.5">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">✓</span>
-                  <span><strong>Your files remain in Google Drive</strong> — no files are modified or deleted.</span>
+                  <span><strong>You choose the folder</strong> — select your specific course directory.</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">✓</span>
-                  <span><strong>You choose which folder to analyze</strong> — full control over scope.</span>
+                  <span><strong>We don't need your entire Drive</strong> — restricted file scope.</span>
                 </li>
                 <li className="flex items-center gap-2.5">
                   <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">✓</span>
-                  <span><strong>MemoryMap only processes permitted content</strong> for AI concept mapping.</span>
+                  <span><strong>Only supported learning resources are analyzed</strong> for concept extraction.</span>
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-xs font-bold shrink-0">✓</span>
+                  <span><strong>You can disconnect Google Drive anytime</strong> with full data control.</span>
                 </li>
               </ul>
             </div>
@@ -197,6 +234,13 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
             <p className="text-[11px] text-slate-400 italic">
               “Connect a folder containing your learning materials. MemoryMap will organize the knowledge inside it.”
             </p>
+
+            {/* Disconnect notification if recently disconnected */}
+            {disconnectNotice && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl text-amber-300 text-xs text-left">
+                {disconnectNotice}
+              </div>
+            )}
 
             {/* Continue Button */}
             <button
@@ -221,11 +265,11 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
           </div>
         )}
 
-        {/* STEP 2: CHOOSE YOUR LEARNING FOLDER */}
+        {/* STEP 2: CHOOSE LEARNING FOLDER & SYNC KNOWLEDGE */}
         {step === 'connected' && (
           <div className="space-y-6 py-1 animate-fade-in">
             
-            {/* Connected Badge */}
+            {/* SECTION 20: Real-Looking Connected Badge */}
             <div className="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/30 p-3.5 rounded-xl text-emerald-300 text-xs font-bold">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-emerald-400 shrink-0" />
@@ -266,13 +310,15 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-xs font-bold text-white font-sans">{folder.name}</h4>
-                          <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
-                            {folder.itemCount} Items
+                          <h4 className="text-xs font-bold text-white font-sans">📁 {folder.name}</h4>
+                          <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 font-bold">
+                            24 learning resources found
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-400 mt-0.5">{folder.description}</p>
-                        <div className="text-[10px] text-indigo-300/80 font-mono mt-1">{folder.path}</div>
+                        <p className="text-[11px] text-slate-400 mt-1">
+                          24 learning resources • 86 concepts • 42 connections
+                        </p>
+                        <div className="text-[10px] text-slate-500 font-mono mt-1">Last synced: Just now</div>
                       </div>
                     </div>
 
@@ -288,24 +334,65 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
               })}
             </div>
 
-            {/* Permitted Files Preview */}
-            {selectedFolderFiles.length > 0 && (
-              <div className="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
-                <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                  <FileText className="w-3.5 h-3.5 text-cyan-400" /> Files to be processed in [{selectedFolder?.name}]:
-                </span>
-                <div className="space-y-1.5 pt-1">
-                  {selectedFolderFiles.map(file => (
-                    <div key={file.id} className="flex items-center justify-between text-xs text-slate-300 bg-slate-950/80 p-2 rounded-lg border border-slate-800/80">
-                      <span className="font-mono text-[11px] truncate max-w-[280px]">📄 {file.name}</span>
-                      <span className="text-[10px] font-bold text-cyan-400 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">{file.type}</span>
-                    </div>
-                  ))}
+            {/* SECTION 16: AUTO SYNC SETTING */}
+            <div className="bg-slate-900/90 p-4 rounded-xl border border-slate-800 flex items-center justify-between">
+              <div className="space-y-0.5">
+                <div className="text-xs font-bold text-white font-sans">Automatic Knowledge Sync</div>
+                <div className="text-[11px] text-slate-400">
+                  MemoryMap checks your selected learning folder for new or changed resources.
                 </div>
+              </div>
+
+              <button
+                onClick={handleToggleAutoSync}
+                className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all border ${
+                  autoSyncEnabled
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40'
+                    : 'bg-slate-800 text-slate-400 border-slate-700'
+                }`}
+              >
+                [{autoSyncEnabled ? 'ON' : 'OFF'}]
+              </button>
+            </div>
+
+            {/* SECTION 17: DISCONNECT GOOGLE DRIVE */}
+            {showDisconnectConfirm ? (
+              <div className="bg-red-950/40 border border-red-500/40 p-4 rounded-xl space-y-3">
+                <div className="flex items-center gap-2 text-xs font-bold text-red-300">
+                  <AlertCircle className="w-4 h-4 text-red-400" />
+                  <span>Disconnect Google Drive Integration?</span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Future synchronization will stop and active tokens will be removed. Your existing processed knowledge map remains saved locally in your workspace.
+                </p>
+                <div className="flex items-center gap-2 justify-end pt-1">
+                  <button
+                    onClick={() => setShowDisconnectConfirm(false)}
+                    className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs font-semibold hover:bg-slate-700"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleDisconnectDrive}
+                    className="px-4 py-1.5 rounded-lg bg-red-600 text-white text-xs font-bold hover:bg-red-500"
+                  >
+                    Confirm Disconnect
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex items-center justify-between text-xs pt-1">
+                <button
+                  onClick={() => setShowDisconnectConfirm(true)}
+                  className="text-red-400 hover:text-red-300 text-[11px] font-semibold flex items-center gap-1.5"
+                >
+                  <Power className="w-3.5 h-3.5" />
+                  <span>Disconnect Google Drive</span>
+                </button>
               </div>
             )}
 
-            {/* Action Buttons */}
+            {/* Action Buttons: Step 4 -> Click [ Sync Knowledge ] */}
             <div className="flex items-center justify-between pt-2">
               <button
                 onClick={() => setStep('initial')}
@@ -314,18 +401,18 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
                 Back
               </button>
               <button
-                onClick={handleIngestFolder}
-                className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 active:scale-95"
+                onClick={handleSyncKnowledge}
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-black uppercase tracking-wider shadow-xl shadow-indigo-600/30 transition-all flex items-center gap-2 active:scale-95"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Select Folder & Analyze</span>
+                <RotateCcw className="w-4 h-4" />
+                <span>Sync Knowledge</span>
               </button>
             </div>
 
           </div>
         )}
 
-        {/* STEP 3: SYNCING & AI INGESTION PIPELINE */}
+        {/* STEP 3 & 5: PROCESSING ANIMATION (Extracting, Identifying, Finding, Updating) */}
         {step === 'syncing' && (
           <div className="space-y-8 text-center py-6 animate-fade-in">
             
@@ -335,18 +422,17 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
               </div>
               <h3 className="text-xl font-bold text-white font-sans">Organizing Google Drive Knowledge</h3>
               <p className="text-xs text-slate-400">
-                Reading permitted files from "{selectedFolder?.name}" & generating Knowledge Map
+                Syncing permitted files from "{selectedFolder?.name}" into MemoryMap
               </p>
             </div>
 
-            {/* 5 Step Progress List */}
+            {/* STEP 5 PROCESSING SEQUENCE */}
             <div className="space-y-3 max-w-md mx-auto text-left">
               {[
-                { num: 1, label: 'Connecting to Google Drive API', desc: 'Validating OAuth permissions & folder scope...' },
-                { num: 2, label: 'Reading Permitted Study Materials', desc: `Scanning ${selectedFolderFiles.length || 4} PDFs, PPTs, & Notes in folder...` },
-                { num: 3, label: 'AI Concept Extraction Engine', desc: 'Extracting definitions, formulas & key terms...' },
-                { num: 4, label: 'Finding Prerequisites & Relationships', desc: 'Connecting nodes into personal Knowledge Map...' },
-                { num: 5, label: 'Updating MemoryMap System', desc: 'Refreshing Dashboard, Learning Gaps & Recovery Search!' }
+                { num: 1, label: 'Extracting...', desc: 'Parsing document structures, chapters, and sections...' },
+                { num: 2, label: 'Identifying concepts...', desc: 'Extracting definitions, formulas, and key terms...' },
+                { num: 3, label: 'Finding relationships...', desc: 'Connecting prerequisite links and conceptual edges...' },
+                { num: 4, label: 'Updating knowledge map...', desc: 'Refreshing Knowledge Graph, Learning Gaps & Recovery Index!' }
               ].map(s => {
                 const isDone = syncingProgress > s.num;
                 const isCurrent = syncingProgress === s.num;
@@ -354,7 +440,7 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
                 return (
                   <div
                     key={s.num}
-                    className={`p-3 rounded-xl border flex items-center justify-between transition-all duration-300 ${
+                    className={`p-3.5 rounded-xl border flex items-center justify-between transition-all duration-300 ${
                       isDone 
                         ? 'bg-emerald-950/40 border-emerald-500/40 text-emerald-300' 
                         : isCurrent
@@ -373,7 +459,7 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
                         {isDone ? '✓' : s.num}
                       </div>
                       <div>
-                        <div className="text-xs font-bold">{s.label}</div>
+                        <div className="text-xs font-bold font-sans">{s.label}</div>
                         <div className="text-[10px] text-slate-400 font-mono">{s.desc}</div>
                       </div>
                     </div>
@@ -389,7 +475,7 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
           </div>
         )}
 
-        {/* STEP 4: COMPLETED SUMMARY */}
+        {/* STEP 6: SYNC RESULT SUMMARY (24 resources, 86 concepts, 42 connections, 7 learning gaps) */}
         {step === 'completed' && ingestResult && (
           <div className="space-y-6 py-2 animate-fade-in">
             
@@ -400,32 +486,36 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
               </div>
               <h3 className="text-lg font-bold text-white font-sans">Knowledge Map Successfully Updated!</h3>
               <p className="text-xs text-slate-300">
-                MemoryMap has organized knowledge from your Google Drive folder <strong>"{ingestResult.folderName}"</strong>.
+                MemoryMap has organized knowledge from Google Drive folder <strong>"{ingestResult.folderName}"</strong>.
               </p>
             </div>
 
-            {/* Ingestion Stats Grid */}
-            <div className="grid grid-cols-3 gap-3 text-center">
-              <div className="glass-card p-3 rounded-xl border border-cyan-500/30">
-                <div className="text-2xl font-extrabold text-white">{ingestResult.filesProcessed}</div>
-                <div className="text-[10px] font-bold text-cyan-300 uppercase">Files Read</div>
+            {/* STEP 6: COMPETITION METRICS DISPLAY */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+              <div className="glass-card p-3.5 rounded-xl border border-cyan-500/30">
+                <div className="text-2xl font-extrabold text-white font-sans">{ingestResult.filesProcessed}</div>
+                <div className="text-[10px] font-bold text-cyan-300 uppercase tracking-wider">Resources</div>
               </div>
-              <div className="glass-card p-3 rounded-xl border border-indigo-500/30">
-                <div className="text-2xl font-extrabold text-white">{ingestResult.conceptsExtracted}</div>
-                <div className="text-[10px] font-bold text-indigo-300 uppercase">Concepts Mapped</div>
+              <div className="glass-card p-3.5 rounded-xl border border-indigo-500/30">
+                <div className="text-2xl font-extrabold text-white font-sans">{ingestResult.conceptsExtracted}</div>
+                <div className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider">Concepts</div>
               </div>
-              <div className="glass-card p-3 rounded-xl border border-purple-500/30">
-                <div className="text-2xl font-extrabold text-white">100%</div>
-                <div className="text-[10px] font-bold text-purple-300 uppercase">Sync Complete</div>
+              <div className="glass-card p-3.5 rounded-xl border border-purple-500/30">
+                <div className="text-2xl font-extrabold text-white font-sans">{ingestResult.connectionsCreated}</div>
+                <div className="text-[10px] font-bold text-purple-300 uppercase tracking-wider">Connections</div>
+              </div>
+              <div className="glass-card p-3.5 rounded-xl border border-amber-500/30">
+                <div className="text-2xl font-extrabold text-amber-400 font-sans">{ingestResult.learningGapsCount}</div>
+                <div className="text-[10px] font-bold text-amber-300 uppercase tracking-wider">Learning Gaps</div>
               </div>
             </div>
 
-            {/* Ingested Materials List */}
+            {/* Ingested Materials Preview */}
             <div className="space-y-2">
               <span className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <BookOpen className="w-3.5 h-3.5 text-cyan-400" /> Ingested Study Materials:
               </span>
-              <div className="space-y-2 max-h-40 overflow-y-auto">
+              <div className="space-y-2 max-h-36 overflow-y-auto">
                 {ingestResult.ingestedResults?.map((res, idx) => (
                   <div key={idx} className="bg-slate-900/80 p-3 rounded-xl border border-slate-800 space-y-1">
                     <div className="flex items-center justify-between text-xs">
@@ -441,12 +531,12 @@ export default function GoogleDriveModal({ isOpen, onClose, onIngestionComplete 
             </div>
 
             {/* Actions Footer */}
-            <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+            <div className="flex items-center gap-3 pt-2">
               <button
                 onClick={onClose}
-                className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all text-center"
+                className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all text-center"
               >
-                Go to Dashboard
+                Go to Dashboard & Test Knowledge Recovery
               </button>
             </div>
 
