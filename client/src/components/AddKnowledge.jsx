@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { PlusCircle, Upload, FileText, Presentation, FileCode, Globe, Sparkles, CheckCircle2, ArrowRight, Tag, Layers, RefreshCw, BookOpen, Compass, Check } from 'lucide-react';
 
-export default function AddKnowledge({ onNavigate, onRefresh }) {
-  const [activeInputType, setActiveInputType] = useState('PDF'); // PDF, PPT, NOTES, PASTE, URL
+export default function AddKnowledge({ onNavigate, onRefresh, onOpenDrive }) {
+  const [activeInputType, setActiveInputType] = useState('GDRIVE'); // GDRIVE, PDF, PPT, NOTES, PASTE, URL
   const [title, setTitle] = useState('');
   const [course, setCourse] = useState('Computer Science');
   const [author, setAuthor] = useState('Student Note');
@@ -116,7 +116,7 @@ Section 9.3: Residual Skip Connections (ResNets). Skip connections pass identity
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-white font-sans">Add Knowledge Material</h1>
             <p className="text-xs text-slate-400">
-              Ingest PDFs, PPTs, handwritten notes, or web links into your personal MemoryMap.
+              Connect your Google Drive learning space or ingest PDFs, PPTs, and notes.
             </p>
           </div>
         </div>
@@ -136,13 +136,44 @@ Section 9.3: Residual Skip Connections (ResNets). Skip connections pass identity
       {status === 0 && (
         <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-white/10 space-y-6">
           
+          {/* Google Drive Primary Connect Callout */}
+          <div className="bg-gradient-to-r from-indigo-950/80 via-slate-900 to-purple-950/80 border border-indigo-500/40 p-6 rounded-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-bold text-indigo-300 flex items-center gap-2 uppercase tracking-wider">
+                <span className="text-base">🔗</span> Recommended Knowledge Workflow
+              </span>
+              <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                Zero Manual Upload
+              </span>
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-white font-sans">Connect Your Google Drive Learning Space</h3>
+              <p className="text-xs text-slate-300">
+                Turn your existing Google Drive study materials into your personal knowledge map automatically.
+              </p>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={onOpenDrive}
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all flex items-center gap-2 active:scale-95"
+              >
+                <span className="text-base">🔗</span>
+                <span>Connect Google Drive</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
           {/* Preset Demo Banner */}
           <div className="bg-slate-900/90 border border-indigo-500/30 p-4 rounded-xl space-y-2">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5 uppercase tracking-wider">
-                <Sparkles className="w-4 h-4 text-indigo-400" /> Quick Presentation Demo Presets
+                <Sparkles className="w-4 h-4 text-indigo-400" /> Manual File Ingestion Fallback
               </span>
-              <span className="text-[10px] text-slate-400">One-click load</span>
+              <span className="text-[10px] text-slate-400">Direct upload</span>
             </div>
             <div className="flex flex-wrap gap-2 pt-1">
               <button
@@ -150,7 +181,7 @@ Section 9.3: Residual Skip Connections (ResNets). Skip connections pass identity
                 onClick={() => handleDemoPreset('java')}
                 className="text-xs px-3.5 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-200 border border-indigo-500/40 font-semibold transition-all"
               >
-                📄 Load "Java Collections.pdf" (Prompt Example)
+                📄 Load "Java Collections.pdf"
               </button>
               <button
                 type="button"
@@ -165,7 +196,16 @@ Section 9.3: Residual Skip Connections (ResNets). Skip connections pass identity
           {/* Format Type Tabs */}
           <div className="space-y-2">
             <label className="text-xs font-bold text-slate-300 uppercase tracking-wider">Select Material Format</label>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-6 gap-2">
+              <button
+                type="button"
+                onClick={onOpenDrive}
+                className="flex flex-col items-center gap-1.5 p-3 rounded-xl border border-indigo-500/50 bg-indigo-600/30 text-white shadow-lg hover:border-indigo-400 text-xs font-bold transition-all"
+              >
+                <span className="text-lg">🔗</span>
+                <span>Google Drive</span>
+              </button>
+
               <button
                 type="button"
                 onClick={() => setActiveInputType('PDF')}

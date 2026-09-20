@@ -10,6 +10,7 @@ import ConceptExplorer from './components/ConceptExplorer';
 import MaterialsList from './components/MaterialsList';
 import UploadModal from './components/UploadModal';
 import LoginModal from './components/LoginModal';
+import GoogleDriveModal from './components/GoogleDriveModal';
 import GapAnalyzer from './components/GapAnalyzer';
 import Flashcards from './components/Flashcards';
 import ConceptDrawer from './components/ConceptDrawer';
@@ -21,6 +22,7 @@ export default function App() {
   const [summary, setSummary] = useState(null);
   const [healthStatus, setHealthStatus] = useState(null);
   const [isUploadOpen, setIsUploadOpen] = useState(false);
+  const [isDriveOpen, setIsDriveOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [user, setUser] = useState({ id: 'u-1', name: 'Alex Rivera', email: 'demo@memorymap.com', role: 'CS Student' });
@@ -115,6 +117,7 @@ export default function App() {
               summary={summary}
               onNavigate={(tab) => setActiveTab(tab)}
               onOpenUpload={() => setIsUploadOpen(true)}
+              onOpenDrive={() => setIsDriveOpen(true)}
             />
           )}
 
@@ -122,6 +125,7 @@ export default function App() {
             <AddKnowledge
               onNavigate={(tab) => setActiveTab(tab)}
               onRefresh={() => fetchSummary()}
+              onOpenDrive={() => setIsDriveOpen(true)}
             />
           )}
 
@@ -210,6 +214,15 @@ export default function App() {
         isOpen={isLoginOpen}
         onClose={() => setIsLoginOpen(false)}
         onLoginSuccess={(loggedUser) => setUser(loggedUser)}
+      />
+
+      {/* Google Drive Connection & Ingestion Modal */}
+      <GoogleDriveModal
+        isOpen={isDriveOpen}
+        onClose={() => setIsDriveOpen(false)}
+        onIngestionComplete={() => {
+          fetchSummary();
+        }}
       />
 
       {/* Concept Drawer */}

@@ -98,7 +98,7 @@ export default function DemoControllerBar({
   return (
     <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-4xl bg-slate-950/95 backdrop-blur-xl border border-amber-500/40 rounded-2xl shadow-2xl p-4 transition-all duration-300 animate-slide-up">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-        
+
         {/* Left: Badge & Step Header */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center shrink-0">
@@ -128,13 +128,12 @@ export default function DemoControllerBar({
             <button
               key={s.id}
               onClick={() => goToStep(s.id)}
-              className={`w-7 h-7 rounded-full text-xs font-bold transition-all flex items-center justify-center ${
-                s.id === currentStep
-                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/30 scale-110'
-                  : s.id < currentStep
+              className={`w-7 h-7 rounded-full text-xs font-bold transition-all flex items-center justify-center ${s.id === currentStep
+                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md shadow-amber-500/30 scale-110'
+                : s.id < currentStep
                   ? 'bg-slate-800 text-amber-400 border border-amber-500/30'
                   : 'bg-slate-900 text-slate-500 hover:text-slate-300'
-              }`}
+                }`}
             >
               {s.id < currentStep ? <CheckCircle2 className="w-4 h-4" /> : s.id}
             </button>
@@ -154,11 +153,10 @@ export default function DemoControllerBar({
 
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-md ${
-              isPlaying
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
-                : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-amber-500/20'
-            }`}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all shadow-md ${isPlaying
+              ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+              : 'bg-amber-500 text-slate-950 hover:bg-amber-400 shadow-amber-500/20'
+              }`}
           >
             {isPlaying ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
             <span>{isPlaying ? 'Pause Auto' : 'Auto Tour'}</span>

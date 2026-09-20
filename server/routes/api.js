@@ -3,6 +3,75 @@ const router = express.Router();
 const store = require('../models/store');
 const { extractConcepts, answerFromKnowledge } = require('../services/aiService');
 const { extractConceptsFromMaterial } = require('../services/aiEngine');
+const driveService = require('../services/googleDriveService');
+
+// ==========================================
+// GOOGLE DRIVE OAUTH & INGESTION REST API
+// ==========================================
+
+// GET /api/auth/google/url - Get Google OAuth Auth URL
+router.get('/auth/google/url', (req, res) => {
+  res.json({ url: driveService.getGoogleAuthUrl() });
+});
+
+// POST /api/auth/google/connect - Connect Google Drive Session
+router.post('/auth/google/connect', (req, res) => {
+  const session = driveService.connectGoogleDrive(req.body);
+  res.json({ success: true, session });
+});
+
+// GET /api/auth/google/demo-callback - Demo callback helper
+router.get('/auth/google/demo-callback', (req, res) => {
+  const session = driveService.connectGoogleDrive();
+  res.json({ success: true, message: 'Google Drive connected successfully!', session });
+});
+
+// GET /api/drive/status - Get Drive connection status
+router.get('/drive/status', (req, res) => {
+  res.json(driveService.getDriveStatus());
+});
+
+// POST /api/drive/disconnect - Disconnect Google Drive
+router.post('/drive/disconnect', (req, res) => {
+  const status = driveService.disconnectGoogleDrive();
+  res.json({ success: true, status });
+});
+
+// GET /api/drive/folders - List Google Drive learning folders
+router.get('/drive/folders', (req, res) => {
+  res.json(driveService.getDriveFolders());
+});
+
+// GET /api/drive/files - List files in folder
+router.get('/drive/files', (req, res) => {
+  const folderId = req.query.folderId || 'folder-college-1';
+  res.json(driveService.getDriveFilesByFolderId(folderId));
+});
+
+// POST /api/drive/ingest-folder - Ingest permitted files from selected folder
+router.post('/api/drive/ingest-folder', async (req, res) => {
+  try {
+    const { folderId } = req.body;
+    const result = await driveService.ingestGoogleDriveFolder(folderId || 'folder-college-1');
+    res.json(result);
+  } catch (err) {
+    console.error('Drive Ingestion Error:', err);
+    res.status(500).json({ error: 'Failed to process Google Drive folder' });
+  }
+});
+
+// POST /api/drive/ingest - Alias for folder ingestion
+router.post('/drive/ingest', async (req, res) => {
+  try {
+    const { folderId } = req.body;
+    const result = await driveService.ingestGoogleDriveFolder(folderId || 'folder-college-1');
+    res.json(result);
+  } catch (err) {
+    console.error('Drive Ingestion Error:', err);
+    res.status(500).json({ error: 'Failed to process Google Drive folder' });
+  }
+});
+
 
 // ==========================================
 // 1. AUTHENTICATION REST API (Section 14 & 15)

@@ -1,7 +1,7 @@
 import React from 'react';
 import { BookOpen, Brain, Network, AlertTriangle, Search, Plus, Sparkles, Clock, ArrowRight, FileText, CheckCircle2, ChevronRight, Compass, RotateCcw } from 'lucide-react';
 
-export default function Dashboard({ summary, onNavigate, onOpenUpload, onSearchQuery }) {
+export default function Dashboard({ summary, onNavigate, onOpenUpload, onOpenDrive, onSearchQuery }) {
   const stats = summary?.stats || {};
   
   // Real or demo fallback counts matching prompt example: Resources 24, Concepts 146, Connections 38, Learning Gaps 7
@@ -38,42 +38,69 @@ export default function Dashboard({ summary, onNavigate, onOpenUpload, onSearchQ
   return (
     <div className="space-y-6">
       
-      {/* Hero Welcome Banner */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-indigo-500/30 relative overflow-hidden">
+      {/* Primary Dashboard Card: 🔗 Connect Google Drive */}
+      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-indigo-500/40 relative overflow-hidden bg-gradient-to-r from-indigo-950/60 via-slate-900 to-purple-950/60 shadow-2xl">
         
         {/* Glow Effects */}
-        <div className="absolute top-0 right-0 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-80 h-80 bg-purple-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+        <div className="relative z-10 space-y-6">
           
-          <div className="space-y-2 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-              <span>Personal Knowledge Recovery Workspace</span>
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+            
+            <div className="space-y-3 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold uppercase tracking-wider">
+                <span className="text-sm">🔗</span>
+                <span>Core Knowledge Ingestion Workflow</span>
+              </div>
+              
+              <h1 className="text-2xl sm:text-3xl font-black text-white font-sans tracking-tight flex items-center gap-3">
+                <span>🔗 Connect Google Drive</span>
+              </h1>
+
+              <p className="text-slate-200 text-sm sm:text-base font-semibold leading-relaxed">
+                Turn your existing study materials into your personal knowledge map.
+              </p>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-sans tracking-tight">
-              Welcome back to MemoryMap
-            </h1>
-            <p className="text-slate-400 text-xs sm:text-sm leading-relaxed">
-              Your personal AI knowledge engine has mapped your learning materials, extracted key concepts, and indexed semantic relationships.
-            </p>
+
+            {/* Primary Action Button */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
+              <button
+                onClick={onOpenDrive}
+                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-black uppercase tracking-wider shadow-xl shadow-indigo-600/40 transition-all transform hover:scale-[1.03] active:scale-[0.97] flex items-center justify-center gap-2.5"
+              >
+                <span className="text-base">🔗</span>
+                <span>Connect Google Drive</span>
+              </button>
+
+              <button
+                onClick={() => onNavigate('search')}
+                className="px-4 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all flex items-center justify-center gap-2"
+              >
+                <Search className="w-4 h-4 text-indigo-400" />
+                <span>Ask My Knowledge</span>
+              </button>
+            </div>
+
           </div>
 
-          <div className="flex items-center gap-3 w-full lg:w-auto">
-            <button
-              onClick={() => onNavigate('search')}
-              className="flex-1 lg:flex-initial flex items-center justify-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-95"
-            >
-              <Search className="w-4 h-4" />
-              <span>Recover Knowledge Origin</span>
-            </button>
+          {/* Explanation Banner */}
+          <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-300 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
+            <div className="flex items-center gap-2.5">
+              <div className="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
+                💡
+              </div>
+              <span>
+                “Connect a folder containing your learning materials. MemoryMap will organize the knowledge inside it.”
+              </span>
+            </div>
+
             <button
               onClick={onOpenUpload}
-              className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all"
+              className="text-slate-400 hover:text-white font-semibold flex items-center gap-1 shrink-0 underline text-[11px]"
             >
-              <Plus className="w-4 h-4" />
-              <span>Ingest</span>
+              Manual file upload fallback →
             </button>
           </div>
 
