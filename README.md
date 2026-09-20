@@ -101,48 +101,74 @@ MemoryMap creates a unified, searchable personal knowledge space from the user's
 - Node.js (v18 or higher)
 - NPM (v9 or higher)
 
-### Environment Setup
+## 🔗 Google Drive Knowledge Ingestion Flow
+
+MemoryMap replaces manual upload with a seamless Google Drive knowledge workflow:
+
+```
+Student → Connect Google Drive → Select Learning Folder → Sync → AI Concept Ingestion → Knowledge Map → Ask My Knowledge → Learning Gaps
+```
+
+---
+
+## 🔑 Environment & Google OAuth Configuration
+
 Create a `.env` file in `server/`:
 ```env
 PORT=5000
-MONGO_URI=mongodb://localhost:27017/memorymap
-# Optional: add your AI API key or leave empty for Heuristic Presentation Fallback
+MONGODB_URI=
+
+# Optional LLM API Key (Gemini or OpenAI)
 GEMINI_API_KEY=
 OPENAI_API_KEY=
+
+# Google Drive OAuth 2.0 Credentials (Optional: Leave blank for Competition Demo Mode)
+GOOGLE_CLIENT_ID=your_google_client_id_here
+GOOGLE_CLIENT_SECRET=your_google_client_secret_here
+GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
 ```
 
-### Running the Backend
-```bash
-cd server
-npm install
-node index.js
-```
-*Server runs at `http://localhost:5000`*
-
-### Running the Frontend
-```bash
-cd client
-npm install
-npm run dev
-```
-*Frontend runs at `http://localhost:3000`*
+### How to Configure Google OAuth 2.0 (Optional for Production):
+1. Go to **Google Cloud Console** -> **APIs & Services** -> **Credentials**.
+2. Create an **OAuth 2.0 Client ID** (Web application type).
+3. Add `http://localhost:3000/auth/google/callback` to **Authorized redirect URIs**.
+4. Enable the **Google Drive API** under **Enabled APIs & Services**.
+5. Copy your **Client ID** and **Client Secret** into `server/.env`.
 
 ---
 
-## 🔑 Demo Credentials
+## 🏆 10-Step Competition Demonstration Flow
 
-- **Email**: `demo@memorymap.com`
-- **Password**: `demo123`
+1. **Step 1 — Open Dashboard**: Show primary call-to-action: **🔗 Connect Google Drive**.
+2. **Step 2 — Click Connect Google Drive**: Opens modal with OAuth authentication & `YOUR DATA, YOUR CONTROL` privacy card.
+3. **Step 3 — Select Learning Folder**: Choose `📁 College` (24 learning resources found).
+4. **Step 4 — Sync Knowledge**: Click **Sync Knowledge** to initiate processing.
+5. **Step 5 — Multi-Stage Pipeline**: Visual progress (*Extracting... Identifying concepts... Finding relationships... Updating map*).
+6. **Step 6 — Sync Results**: Displays **24 resources | 86 concepts | 42 connections | 7 learning gaps**.
+7. **Step 7 — Ask My Knowledge**: Query *"Where did I learn about HashSet?"*.
+8. **Step 8 — Origin Citation**: Point out result `Java Collections.pdf — Page 12` with text excerpt match.
+9. **Step 9 — Visual Knowledge Map**: Click **View Knowledge Map** to inspect topology (`Java → Collections → HashSet → Duplicate Removal`).
+10. **Step 10 — Learning Gap Diagnostic**: Open **Learning Gaps** to view `HashMap` at 75% coverage with missing topics (`⚠ Collision handling`, `⚠ Hashing mechanism`).
 
 ---
 
-## 🎯 5-Step Competition Presentation Demo Flow
+## 🚀 How to Run
 
-1. **Step 1 — Dashboard Overview**: Open `http://localhost:3000`. Highlight the 146 Concepts stored and 24 Resources.
-2. **Step 2 — Knowledge Recovery Query**: Navigate to **Ask My Knowledge** and ask *"Where did I learn about HashSet?"*.
-3. **Step 3 — Origin Citation**: Point out the result: `Found in Java Collections.pdf — Page 12` with text excerpt and connected concepts.
-4. **Step 4 — Visual Knowledge Map**: Click **"Knowledge Map"** to display the interactive graph topology (`Java → Collections → HashSet → Duplicate Removal`).
-5. **Step 5 — Learning Gap Analysis**: Open **Learning Gaps** page to show `HashMap` at 75% progress with missing topics (`Collision handling`, `Hashing mechanism`) and click **"Learn Next"**.
+1. **Backend Server**:
+   ```bash
+   cd server
+   npm install
+   npm start
+   ```
+   *Runs at `http://localhost:5000`*
+
+2. **Frontend App**:
+   ```bash
+   cd client
+   npm install
+   npm run dev
+   ```
+   *Runs at `http://localhost:3000`*
 
 ---
 
@@ -152,3 +178,4 @@ npm run dev
 - Cross-user collaborative knowledge graph sharing for study groups.
 - Vector database semantic search (FAISS / Pinecone) for multi-gigabyte textbook indexing.
 - Mobile application with offline knowledge graph syncing.
+
