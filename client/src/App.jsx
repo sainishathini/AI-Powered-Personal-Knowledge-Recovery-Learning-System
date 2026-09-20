@@ -9,12 +9,14 @@ import KnowledgeGraph from './components/KnowledgeGraph';
 import ConceptExplorer from './components/ConceptExplorer';
 import MaterialsList from './components/MaterialsList';
 import UploadModal from './components/UploadModal';
+import AddKnowledgeModal from './components/AddKnowledgeModal';
 import LoginModal from './components/LoginModal';
 import GoogleDriveModal from './components/GoogleDriveModal';
 import GapAnalyzer from './components/GapAnalyzer';
 import Flashcards from './components/Flashcards';
 import ConceptDrawer from './components/ConceptDrawer';
-import DemoControllerBar from './components/DemoControllerBar';
+import PresentationAI from './components/PresentationAI';
+import QuickVideoNotesModal from './components/QuickVideoNotesModal';
 
 export default function App() {
   const [viewMode, setViewMode] = useState('app'); // 'landing' or 'app'
@@ -24,11 +26,43 @@ export default function App() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [isDriveOpen, setIsDriveOpen] = useState(false);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isQuickVideoNotesOpen, setIsQuickVideoNotesOpen] = useState(false);
+  const [uploadTab, setUploadTab] = useState('file');
   const [user, setUser] = useState({ id: 'u-1', name: 'Alex Rivera', email: 'demo@memorymap.com', role: 'CS Student' });
   const [selectedConcept, setSelectedConcept] = useState(null);
   const [currentDomain, setCurrentDomain] = useState('aiml');
   const [demoSearchQuery, setDemoSearchQuery] = useState('');
+  const [presentationTopic, setPresentationTopic] = useState('');
+  const [presentationResourceId, setPresentationResourceId] = useState(null);
+
+  const handleOpenUpload = (tab = 'file') => {
+    if (tab === 'video_notes' || tab === 'youtube') {
+      setIsQuickVideoNotesOpen(true);
+      return;
+    }
+    setUploadTab(tab);
+    setIsUploadOpen(true);
+  };
+
+  const handleCreatePresentation = ({ topic, resourceId } = {}) => {
+    if (topic) setPresentationTopic(topic);
+    if (resourceId) setPresentationResourceId(resourceId);
+    setActiveTab('presentation_ai');
+  };
+
+  const handleLoadDemoResources = async () => {
+    try {
+      const res = await fetch('/api/workspace/switch', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ workspaceId: 'aiml' })
+      });
+      const data = await res.json();
+      setSummary(data.summary);
+    } catch (err) {
+      console.error('Failed to load resources:', err);
+    }
+  };
 
   useEffect(() => {
     fetchSummary();
@@ -106,8 +140,6 @@ export default function App() {
           onOpenLogin={() => setIsLoginOpen(true)}
           user={user}
           healthStatus={healthStatus}
-          isDemoMode={isDemoMode}
-          onToggleDemoMode={() => setIsDemoMode(!isDemoMode)}
         />
 
         {/* Main Content Area */}
@@ -116,8 +148,19 @@ export default function App() {
             <Dashboard
               summary={summary}
               onNavigate={(tab) => setActiveTab(tab)}
-              onOpenUpload={() => setIsUploadOpen(true)}
+              onOpenUpload={(tab = 'file') => handleOpenUpload(tab)}
               onOpenDrive={() => setIsDriveOpen(true)}
+              onOpenVideoNotes={() => setIsQuickVideoNotesOpen(true)}
+              onLoadDemoResources={handleLoadDemoResources}
+              onCreatePresentation={handleCreatePresentation}
+            />
+          )}
+
+          {activeTab === 'presentation_ai' && (
+            <PresentationAI
+              initialTopic={presentationTopic}
+              initialResourceId={presentationResourceId}
+              onNavigate={(tab) => setActiveTab(tab)}
             />
           )}
 
@@ -126,6 +169,7 @@ export default function App() {
               onNavigate={(tab) => setActiveTab(tab)}
               onRefresh={() => fetchSummary()}
               onOpenDrive={() => setIsDriveOpen(true)}
+              onOpenUpload={(tab = 'file') => handleOpenUpload(tab)}
             />
           )}
 
@@ -135,6 +179,7 @@ export default function App() {
               initialQuery={demoSearchQuery}
               onSelectConcept={(concept) => setSelectedConcept(concept)}
               onNavigate={(tab) => setActiveTab(tab)}
+              onCreatePresentation={handleCreatePresentation}
             />
           )}
 
@@ -142,19 +187,22 @@ export default function App() {
             <KnowledgeGraph
               onSelectConcept={(concept) => setSelectedConcept(concept)}
               onNavigate={(tab) => setActiveTab(tab)}
+              onCreatePresentation={handleCreatePresentation}
             />
           )}
 
           {activeTab === 'explorer' && (
             <ConceptExplorer
               onNavigate={(tab) => setActiveTab(tab)}
+              onCreatePresentation={handleCreatePresentation}
             />
           )}
 
           {activeTab === 'materials' && (
             <MaterialsList
-              onOpenUpload={() => setIsUploadOpen(true)}
+              onOpenUpload={(tab = 'file') => handleOpenUpload(tab)}
               onNavigate={(tab) => setActiveTab(tab)}
+              onCreatePresentation={handleCreatePresentation}
             />
           )}
 
@@ -173,8 +221,12 @@ export default function App() {
               <h2 className="text-xl font-bold text-white">MemoryMap System Settings</h2>
               <div className="space-y-3 bg-slate-900/80 p-4 rounded-xl border border-slate-800">
                 <div className="flex justify-between items-center">
-                  <span>AI Model Integration:</span>
-                  <span className="font-bold text-emerald-400">Presentation Fallback Engine</span>
+                  <span>AI Presentation Generator:</span>
+                  <span className="font-bold text-emerald-400">pptxgenjs Engine Active</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span>Quick Video Notes Engine:</span>
+                  <span className="font-bold text-purple-400">Active (YouTube & Video Files)</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Vector Embedding Store:</span>
@@ -195,18 +247,25 @@ export default function App() {
 
         {/* Footer */}
         <footer className="border-t border-white/5 py-4 text-center text-xs text-slate-500 glass-panel">
-          MemoryMap — AI-Powered Personal Knowledge Recovery & Learning System • Presentation Prototype
+          MemoryMap — AI-Powered Personal Knowledge Recovery & Learning System
         </footer>
 
       </div>
 
-      {/* Upload Modal */}
-      <UploadModal
+      {/* Multi-Source Add Knowledge Modal (File Uploads) */}
+      <AddKnowledgeModal
         isOpen={isUploadOpen}
+        initialTab={uploadTab}
         onClose={() => setIsUploadOpen(false)}
-        onRefresh={() => {
-          fetchSummary();
-        }}
+        onRefresh={() => fetchSummary()}
+        onOpenDrive={() => setIsDriveOpen(true)}
+      />
+
+      {/* Dedicated Quick Video Notes Modal */}
+      <QuickVideoNotesModal
+        isOpen={isQuickVideoNotesOpen}
+        onClose={() => setIsQuickVideoNotesOpen(false)}
+        onRefresh={() => fetchSummary()}
       />
 
       {/* Login Modal */}
@@ -229,20 +288,8 @@ export default function App() {
       <ConceptDrawer
         concept={selectedConcept}
         onClose={() => setSelectedConcept(null)}
+        onCreatePresentation={handleCreatePresentation}
       />
-
-      {/* Competition Demo Mode Controller Bar */}
-      {isDemoMode && (
-        <DemoControllerBar
-          activeTab={activeTab}
-          setActiveTab={setActiveTab}
-          onRunDemoQuery={(query) => {
-            setDemoSearchQuery(query);
-            setActiveTab('search');
-          }}
-          onClose={() => setIsDemoMode(false)}
-        />
-      )}
 
     </div>
   );

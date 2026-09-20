@@ -1,10 +1,11 @@
 import React from 'react';
-import { Brain, LayoutDashboard, Search, Network, BookOpen, Compass, AlertTriangle, Settings, User, PlusCircle, Sparkles, ChevronRight } from 'lucide-react';
+import { Brain, LayoutDashboard, Search, Network, BookOpen, Compass, AlertTriangle, Settings, User, PlusCircle, Sparkles, ChevronRight, Presentation } from 'lucide-react';
 
 export default function Sidebar({ activeTab, setActiveTab, onOpenUpload, onToggleLanding }) {
   const menuItems = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, badge: null, color: 'text-cyan-400' },
     { id: 'search', label: 'Ask My Knowledge', icon: Search, badge: 'AI', color: 'text-indigo-400' },
+    { id: 'presentation_ai', label: 'Presentation AI', icon: Presentation, badge: 'PPTX', color: 'text-purple-400' },
     { id: 'graph', label: 'Knowledge Map', icon: Network, badge: null, color: 'text-purple-400' },
     { id: 'materials', label: 'Resources', icon: BookOpen, badge: null, color: 'text-cyan-400' },
     { id: 'explorer', label: 'Concept Explorer', icon: Compass, badge: null, color: 'text-blue-400' },

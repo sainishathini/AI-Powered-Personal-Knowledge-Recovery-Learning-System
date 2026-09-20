@@ -139,29 +139,91 @@ export default function KnowledgeGraph({ onSelectConcept, onNavigate }) {
       const res = await fetch('/api/graph');
       const data = await res.json();
       
-      // If store contains standard nodes, combine with hierarchical view
-      if (data.nodes && data.nodes.length > 0) {
-        setNodes(javaTreeNodes);
-        setEdges(javaTreeEdges);
-        setSelectedNode(javaTreeNodes[2]); // Default select ArrayList
+      if (data && data.nodes && data.nodes.length > 0) {
+        const formattedNodes = data.nodes.map((n, idx) => {
+          const nData = n.data || n;
+          const conceptId = nData.conceptId || n.id || `node-${idx}`;
+          const title = nData.label || n.label || 'CONCEPT';
+          const sourceDocTitle = nData.sourceDocTitle || 'Ingested Learning Resource';
+          const sourceType = nData.sourceType || (sourceDocTitle.endsWith('.mp4') ? 'video' : sourceDocTitle.includes('YouTube') ? 'youtube' : 'file_upload');
+
+          const x = n.x !== undefined ? n.x : 100 + (idx % 3) * 220;
+          const y = n.y !== undefined ? n.y : 35 + Math.floor(idx / 3) * 115;
+
+          return {
+            id: n.id || `node-${idx}`,
+            conceptId,
+            label: title.toUpperCase(),
+            conceptTitle: title,
+            category: nData.category || n.category || 'Core Concept',
+            type: n.type || nData.type || (idx === 0 ? 'root' : (nData.category ? 'concept' : 'subconcept')),
+            mastery: nData.mastery || n.mastery || Math.floor(Math.random() * 30) + 70,
+            definition: nData.definition || nData.snippet || n.definition || 'Extracted learning concept.',
+            snippet: nData.snippet || nData.definition || '',
+            sourceDocId: nData.sourceDocId || null,
+            sourceDocTitle,
+            sourceType,
+            location: nData.location || 'Indexed',
+            resourcesList: [
+              {
+                title: sourceDocTitle,
+                sourceType,
+                location: nData.location || 'Indexed',
+                sourceUrl: nData.sourceUrl || null
+              }
+            ],
+            resources: Array.isArray(nData.resources) 
+              ? nData.resources 
+              : [sourceDocTitle ? `${sourceDocTitle} (${nData.location || 'Section 1'})` : 'Uploaded Material'],
+            related: nData.connectedConcepts || nData.prerequisites || (nData.related || ['Related Topics']),
+            connectedConcepts: nData.connectedConcepts || [],
+            prerequisites: nData.prerequisites || [],
+            status: (nData.mastery && nData.mastery < 60) ? 'NEEDS_REVIEW' : 'MASTERED',
+            nextTopic: (nData.connectedConcepts && nData.connectedConcepts[0]) || 'Advanced Topic',
+            x,
+            y
+          };
+        });
+
+        const formattedEdges = (data.edges || []).map(e => ({
+          from: e.source || e.from,
+          to: e.target || e.to,
+          label: e.label || 'CONNECTED_TO'
+        }));
+
+        setNodes(formattedNodes);
+        setEdges(formattedEdges);
+        if (formattedNodes.length > 0) {
+          setSelectedNode(formattedNodes[0]);
+        }
+      } else {
+        setNodes([]);
+        setEdges([]);
+        setSelectedNode(null);
       }
     } catch (err) {
-      console.error('Failed to load graph:', err);
-      setNodes(javaTreeNodes);
-      setEdges(javaTreeEdges);
-      setSelectedNode(javaTreeNodes[2]);
+      console.error('Failed to load dynamic graph:', err);
+      setNodes([]);
+      setEdges([]);
+      setSelectedNode(null);
     } finally {
       setLoading(false);
     }
   };
+
+  const [selectedResourceFilter, setSelectedResourceFilter] = useState('ALL');
+
+  const resourceOptions = ['ALL', ...new Set(nodes.map(n => n.sourceDocTitle).filter(Boolean))];
 
   const filteredNodes = nodes.filter(n => {
     const matchesSearch = n.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           n.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
                           n.definition.toLowerCase().includes(searchTerm.toLowerCase());
     
-    if (selectedCategory === 'ALL') return matchesSearch;
-    return matchesSearch && n.category === selectedCategory;
+    const matchesCategory = selectedCategory === 'ALL' || n.category === selectedCategory;
+    const matchesResource = selectedResourceFilter === 'ALL' || n.sourceDocTitle === selectedResourceFilter || n.type === 'root';
+
+    return matchesSearch && matchesCategory && matchesResource;
   });
 
   const categories = ['ALL', ...new Set(nodes.map(n => n.category))];
@@ -186,6 +248,22 @@ export default function KnowledgeGraph({ onSelectConcept, onNavigate }) {
         {/* Controls */}
         <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto">
           
+          {/* Resource Source Filter */}
+          <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs">
+            <BookOpen className="w-3.5 h-3.5 text-cyan-400" />
+            <select
+              value={selectedResourceFilter}
+              onChange={(e) => setSelectedResourceFilter(e.target.value)}
+              className="bg-transparent text-cyan-300 font-medium outline-none cursor-pointer max-w-[140px] truncate"
+            >
+              {resourceOptions.map((resTitle, idx) => (
+                <option key={idx} value={resTitle} className="bg-slate-900 text-white">
+                  {resTitle === 'ALL' ? 'All Resources' : resTitle}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* Category Filter */}
           <div className="flex items-center gap-1.5 bg-slate-900 border border-slate-700 rounded-lg px-2.5 py-1.5 text-xs">
             <Filter className="w-3.5 h-3.5 text-slate-400" />
@@ -277,6 +355,26 @@ export default function KnowledgeGraph({ onSelectConcept, onNavigate }) {
               <div className="flex flex-col items-center gap-3 text-slate-400">
                 <div className="w-8 h-8 border-2 border-purple-500 border-t-transparent rounded-full animate-spin" />
                 <span className="text-xs font-semibold">Generating Knowledge Topology Graph...</span>
+              </div>
+            ) : filteredNodes.length === 0 ? (
+              <div className="flex flex-col items-center justify-center text-center p-8 space-y-4 max-w-md mx-auto my-auto z-20">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center text-3xl font-bold border border-indigo-500/30">
+                  🌐
+                </div>
+                <div className="space-y-1">
+                  <h3 className="text-lg font-black text-white font-sans uppercase tracking-tight">YOUR KNOWLEDGE MAP IS EMPTY</h3>
+                  <p className="text-xs text-slate-400 leading-relaxed">
+                    Add your first learning resource to start building your personal knowledge map.
+                  </p>
+                </div>
+                <div className="flex items-center justify-center gap-3 pt-2">
+                  <button
+                    onClick={() => onNavigate && onNavigate('add_knowledge')}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-lg shadow-indigo-600/30 transition-all active:scale-95"
+                  >
+                    + Add Knowledge
+                  </button>
+                </div>
               </div>
             ) : (
               <div 

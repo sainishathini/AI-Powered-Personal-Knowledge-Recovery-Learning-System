@@ -10,6 +10,8 @@ const WORKSPACES = {
         id: 'doc-java-coll',
         title: 'Java Collections.pdf',
         type: 'PDF',
+        sourceType: 'google_drive',
+        sourceUrl: 'Google Drive → College → Java',
         course: 'CS201 - Data Structures & Algorithms',
         author: 'Prof. J. Gosling',
         dateAdded: '2026-02-14',
@@ -27,29 +29,80 @@ Section 4: HashMap key-value mappings storing key-value pairs using hash algorit
 Section 5: Duplicate Removal techniques using HashSet constructor.`
       },
       {
-        id: 'doc-ds-notes',
-        title: 'Data Structures Notes.md',
-        type: 'Notes',
+        id: 'doc-dsa-img',
+        title: 'DSA_Notes.jpg',
+        type: 'Image',
+        sourceType: 'image',
+        sourceUrl: 'Uploaded Whiteboard Diagram',
         course: 'CS201 - Data Structures',
-        author: 'Student Journal',
-        dateAdded: '2026-03-01',
-        pageCount: 18,
-        size: '640 KB',
-        conceptsCount: 8,
+        author: 'Alex Rivera (Handwritten)',
+        dateAdded: '2026-03-05',
+        pageCount: 1,
+        size: '1.4 MB',
+        conceptsCount: 5,
+        connectionsCount: 3,
+        mainTopics: ['Linked List', 'Node', 'Head', 'Tail', 'Traversal', 'Insertion'],
+        status: 'OCR Parsed & Mapped',
+        extractedText: 'OCR Analysis: Linked List diagram showing Node pointers (Head -> Node 1 -> Node 2 -> Tail). Traversal O(N), Insertion at Head O(1).'
+      },
+      {
+        id: 'doc-dsa-video',
+        title: 'DSA_Lecture.mp4',
+        type: 'Video',
+        sourceType: 'video',
+        sourceUrl: 'Lecture Recording',
+        course: 'CS201 - Data Structures',
+        author: 'Prof. J. Gosling',
+        dateAdded: '2026-03-08',
+        pageCount: 1,
+        size: '145 MB',
+        conceptsCount: 4,
+        connectionsCount: 3,
+        mainTopics: ['Linked List', 'Node Insertion', 'Doubly Linked List'],
+        status: 'Transcript Indexed',
+        transcript: '00:00 Introduction to Data Structures | 12:42 Linked List insertion algorithm explanation and pointer updates | 34:50 Doubly Linked Lists'
+      },
+      {
+        id: 'doc-yt-java',
+        title: 'Java Collections Explained',
+        type: 'YouTube',
+        sourceType: 'youtube',
+        sourceUrl: 'https://youtube.com/watch?v=java-collections-explained',
+        channel: 'CodeWithHarry / Telusko',
+        course: 'Java Programming',
+        author: 'YouTube Educator',
+        dateAdded: '2026-03-12',
+        pageCount: 1,
+        size: 'Stream',
+        conceptsCount: 6,
         connectionsCount: 4,
-        mainTopics: ['Stack', 'Queue', 'Linked List', 'Tree', 'Recursion'],
-        status: 'Indexed & Mapped',
-        content: `Data Structures Core Notes:
-- Stack: LIFO data structure with push and pop operations.
-- Queue: FIFO data structure with enqueue and dequeue.
-- Linked List: Node pointers with dynamic allocation.
-- Tree: Hierarchical nodes with root and leaf child links.
-- Recursion: Self-referential functions with base cases preventing call stack overflow.`
+        mainTopics: ['ArrayList', 'HashSet', 'HashMap', 'Collections', '18:42 Timestamp'],
+        status: 'Captions Parsed',
+        transcript: '05:30 ArrayList dynamic resizing | 18:42 HashSet hashing mechanics and duplicate removal algorithm | 26:40 HashMap key-value pairs'
+      },
+      {
+        id: 'doc-note-hashset',
+        title: 'My HashSet Notes',
+        type: 'Notes',
+        sourceType: 'note',
+        sourceUrl: 'User Workspace Note',
+        course: 'CS201 - Revision Journal',
+        author: 'Alex Rivera',
+        dateAdded: '2026-03-15',
+        pageCount: 1,
+        size: '12 KB',
+        conceptsCount: 3,
+        connectionsCount: 2,
+        mainTopics: ['HashSet', 'Unique Elements', 'Duplicate Removal'],
+        status: 'Text Analyzed',
+        content: 'HashSet stores unique elements. It does not allow duplicate values. It is useful when duplicate removal is required.'
       },
       {
         id: 'doc-dbms-notes',
-        title: 'DBMS Notes.pdf',
-        type: 'PDF',
+        title: 'DBMS Normalization.pptx',
+        type: 'PPT',
+        sourceType: 'file_upload',
+        sourceUrl: 'Uploaded Presentation',
         course: 'CS302 - Database Systems',
         author: 'Dr. E. F. Codd',
         dateAdded: '2026-03-10',
@@ -63,23 +116,6 @@ Section 5: Duplicate Removal techniques using HashSet constructor.`
 Section 1: Database relational models and SQL query execution.
 Section 2: Normalization 1NF, 2NF, 3NF, BCNF to eliminate data redundancy.
 Section 3: Primary Key unique entity identification and Foreign Key relational constraints.`
-      },
-      {
-        id: 'doc-dl-opt',
-        title: 'Deep_Learning_Lecture_04_Optimization.pdf',
-        type: 'PDF',
-        course: 'CS701 - Deep Learning',
-        author: 'Prof. A. Vance',
-        dateAdded: '2026-02-10',
-        pageCount: 42,
-        size: '3.4 MB',
-        conceptsCount: 15,
-        connectionsCount: 8,
-        mainTopics: ['Vanishing Gradient', 'Exploding Gradient', 'ResNet Skips', 'BPTT'],
-        status: 'Indexed & Mapped',
-        content: `Chapter 4: Optimization in Deep Neural Networks.
-Section 4.1: Vanishing Gradient Problem in deep architectures.
-Section 4.2: Exploding Gradients & Gradient Clipping.`
       }
     ],
 

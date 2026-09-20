@@ -1,181 +1,136 @@
 # 🧠 MemoryMap — AI-Powered Personal Knowledge Recovery & Learning System
 
-> **“You remember the concept. We find the knowledge.”**
+> **“Your learning is scattered. Your knowledge doesn't have to be.”**
 
-MemoryMap is a competition-ready personal AI knowledge recovery system built for students and researchers. It converts fragmented learning materials (PDFs, PPTs, handwritten notes, web links) into an interactive knowledge map, allowing users to ask *"Where did I learn this?"* and instantly retrieve exact document citations, section/page locations, direct text snippets, and prerequisite connections.
+MemoryMap is a competition-ready personal AI knowledge recovery system built for students and researchers. It converts fragmented learning materials (**Google Drive folders**, **PDFs**, **PPTs**, **Images via OCR**, **Video Lectures**, **YouTube URLs**, and **Quick Notes**) into an interactive knowledge map, allowing users to ask *"Where did I learn this?"* and instantly retrieve exact multi-source citations, timestamp markers, slide/page locations, and prerequisite connections.
 
 ---
 
 ## ❓ Problem Statement
 
-Students learn from numerous sources such as PDFs, PPTs, lecture notes, websites, and research papers. Later, they often remember a concept but forget **WHERE** they learned it. Searching manually through dozens of multi-page files wastes valuable study time and creates fragmented, disconnected knowledge.
+Students learn from numerous scattered sources such as Google Drive folders, PDFs, slides, handwritten whiteboards, YouTube videos, and lecture recordings. Later, they remember a concept but forget **WHERE** they learned it. Searching manually across dozens of files and video timelines wastes time and creates fragmented knowledge.
 
 ---
 
 ## 💡 Proposed Solution
 
-MemoryMap creates a unified, searchable personal knowledge space from the user's learning materials:
-1. **Material Ingestion**: Upload multi-format learning materials (PDF, PPT, Text, Web URL).
-2. **AI Concept Extraction**: Automatically extracts concepts, definitions, summary, and keywords.
+MemoryMap creates a single, searchable personal knowledge space from all learning inputs:
+1. **Multi-Source Ingestion**: Connect Google Drive, upload local files (PDF, PPT, Word, JPG, MP4), paste YouTube URLs, or create quick text notes.
+2. **AI Concept Extraction**: Common knowledge analyzer extracts concepts, definitions, keywords, and summaries across formats.
 3. **Topology Mapping**: Automatically discovers relationships between concepts (e.g., `Java → Collections → HashSet → Duplicate Removal`).
-4. **Natural Language Knowledge Recovery**: Enter natural language queries like *"Where did I learn about HashSet?"* to receive exact document citations, page numbers, and quotes.
+4. **Natural Language Knowledge Recovery**: Query *"Where did I learn about HashSet?"* to receive exact multi-source citations (`Java Collections.pdf — Page 12`, `My HashSet Notes`, `YouTube — 18:42`, `DSA_Notes.jpg OCR`).
+5. **Learning Gaps Diagnostic**: Visual coverage breakdown (e.g. `HashMap — 75%`) with suggested gap-filling study materials.
 
 ---
 
 ## 🌟 Key Features
 
-1. **🔐 Demo Authentication Interface**
-   - Demo login modal with 1-click credentials (`demo@memorymap.com` / `demo123`).
-   - Clean JWT token simulation for authentication routes (`/api/auth/login`, `/api/auth/register`).
+1. **🔗 Google Drive Knowledge Ingestion**
+   - Connect Google Drive folders with minimal `drive.readonly` permissions.
+   - Diff-based incremental sync: processes new/modified files, skips unchanged files, and supports instant disconnect.
 
-2. **📊 Comprehensive SaaS Dashboard**
-   - Total Metrics Widgets: 24 Resources, 146 Concepts, 38 Connections, 7 Learning Gaps.
-   - Recently Recovered Knowledgefeed with instant document citations.
-   - Suggested Learning Topics & Recent Search History.
+2. **📤 Multi-Source Format Support**
+   - **Documents**: PDF page & heading parser, PPT slide reader, Word/TXT parser.
+   - **Images**: OCR text extraction for whiteboard diagrams and handwritten notes.
+   - **Video Files**: Timestamped transcript parsing for recorded lectures (`.mp4`).
+   - **YouTube**: Caption extraction and timestamp navigation (`05:30`, `18:42`, `26:40`).
+   - **Quick Notes**: Instant text note & markdown revision journal indexing.
 
-3. **📥 Add Knowledge & Real-Time Processing Pipeline**
-   - Multi-format ingestion: Upload PDF, PPT/PPTX, Notes, Paste Text, or Web URL.
-   - 5-Step visual processing pipeline (*Uploading → Extracting Content → Identifying Concepts → Finding Relationships → Adding to MemoryMap*).
-   - Post-ingestion summary showing extracted concepts, keywords, and related concepts.
+3. **🎯 Restructured Dashboard & ADD KNOWLEDGE Grid**
+   - 3-card ingestion suite for Google Drive, Local File Upload, and YouTube/Note URL processing.
+   - Live metrics summary: 24 Resources, 146 Concepts, 38 Connections, 7 Learning Gaps.
 
-4. **🔍 Natural Language Search & Knowledge Recovery ("Ask My Knowledge")**
-   - Direct natural language Q&A engine with guaranteed demo queries (*"Where did I learn about HashSet?"*, *"What did I learn about Java Collections?"*, etc.).
-   - Returns primary concept card, origin citation (`Java Collections.pdf — Page 12`), direct text excerpt, confidence score, and prerequisite chips.
+4. **🔍 "Ask My Knowledge" Multi-Source Citation Engine**
+   - Natural language search with origin traceability (`📄 PDF Page`, `📝 Note`, `▶️ YouTube Timestamp`, `🖼️ Image OCR`).
 
-5. **🌐 Interactive SVG Knowledge Graph Map**
-   - Visual network of connected learning materials (cyan nodes) and extracted concepts (purple nodes).
-   - Category filtering (Java Architecture, Java Collections, Data Structures, DBMS, Algorithms).
-   - Live search node filter & interactive Node Inspector Drawer.
+5. **🌐 Interactive Visual Knowledge Map**
+   - SVG network graph with source-coded node tags, category filters, and node inspector drawer.
 
-6. **🎯 Learning Gap & Mastery Diagnostic**
-   - Concept progress cards (`HashMap` 75% complete: `✓ Basic usage`, `✓ Key-value pairs`, `⚠ Collision handling`, `⚠ Hashing mechanism`).
-   - Actionable **"Learn Next"** CTA buttons.
-   - Interactive AI Verification Quizzes with instant explanation feedback.
+6. **📊 Learning Gap & Mastery Diagnostic**
+   - Coverage progress bars, mastered vs missing topic breakdown, and targeted gap-filling resource recommendations.
 
-7. **📚 Knowledge Resource Library & Concept Explorer**
-   - Filterable cards displaying document format, page count, concept count, and connections.
-   - Search for specific concepts like `HashSet` to view description, source location, and related concept links.
+7. **📚 Resource Library Filter Tabs**
+   - Filter materials by `ALL`, `Google Drive`, `Documents`, `Images`, `Videos`, `YouTube`, and `Notes`.
 
 ---
 
 ## 🏗️ System Architecture
 
 ```
-[ User Input (PDF / Notes / Search Query) ]
-                   │
-                   ▼
-  ┌─────────────────────────────────┐
-  │  Vite React SaaS UI (Port 3000) │
-  └────────────────┬────────────────┘
-                   │ REST API
-                   ▼
-  ┌─────────────────────────────────┐
-  │  Express Node Server (Port 5000)│
-  └───────┬─────────────────┬───────┘
-          │                 │
-          ▼                 ▼
- ┌────────────────┐ ┌───────────────────────────┐
- │ MongoDB Models │ │ Dual-Mode AI Engine       │
- │ - User         │ │ - Live LLM (Gemini/OpenAI)│
- │ - Resource     │ │ - Heuristic NLP Fallback  │
- │ - Concept      │ └───────────────────────────┘
- │ - Relation     │
- │ - LearningGap  │
- └────────────────┘
+  PDF / PPT / Word ──────┐
+  Image (OCR) ───────────┤
+  Video (.mp4) ──────────┤
+  YouTube Captions ──────┼──► Common Knowledge Analyzer (aiService.js)
+  Notes / Text ──────────┤
+  Google Drive ──────────┘
+                         │
+                         ▼
+        ┌────────────────────────────────┐
+        │   Personal Knowledge Store     │
+        └────────────────┬───────────────┘
+                         │
+        ┌────────────────┴────────────────┐
+        ▼                                 ▼
+┌──────────────┐                 ┌─────────────────┐
+│ KnowledgeMap │                 │ Ask My Knowledge│
+└──────────────┘                 └─────────────────┘
 ```
 
 ---
 
 ## 🛠️ Technology Stack
 
-- **Frontend**: React.js, Vite, Tailwind CSS, Lucide React Icons, Recharts.
+- **Frontend**: React.js, Vite, Tailwind CSS, Lucide React Icons.
 - **Backend**: Node.js, Express.js, Multer, PDF-Parse.
-- **Database**: Mongoose (MongoDB) + In-Memory Fallback Store.
+- **Database**: In-Memory Store & MongoDB Mongoose models (`Resource`, `Concept`, `LearningGap`).
 - **AI Engine**: Dual-Mode AI Service (`aiService.js`) with LLM integration & Heuristic local fallback.
 
 ---
 
-## 🚀 Installation & How to Run
+## 🔑 Environment Configuration & Setup Guide
 
-### Prerequisites
-- Node.js (v18 or higher)
-- NPM (v9 or higher)
-
-## 🔗 Google Drive Knowledge Ingestion Flow
-
-MemoryMap replaces manual upload with a seamless Google Drive knowledge workflow:
-
-```
-Student → Connect Google Drive → Select Learning Folder → Sync → AI Concept Ingestion → Knowledge Map → Ask My Knowledge → Learning Gaps
-```
-
----
-
-## 🔑 Environment & Google OAuth Configuration
+See [GOOGLE_DRIVE_SETUP.md](GOOGLE_DRIVE_SETUP.md) for full Google Cloud OAuth 2.0 instructions.
 
 Create a `.env` file in `server/`:
 ```env
 PORT=5000
 MONGODB_URI=
 
-# Optional LLM API Key (Gemini or OpenAI)
+# Optional LLM Key (Gemini / OpenAI). Fallback heuristic mode active if empty.
 GEMINI_API_KEY=
 OPENAI_API_KEY=
 
-# Google Drive OAuth 2.0 Credentials (Optional: Leave blank for Competition Demo Mode)
+# Google Drive OAuth 2.0 Credentials (Optional for Demo Mode)
 GOOGLE_CLIENT_ID=your_google_client_id_here
 GOOGLE_CLIENT_SECRET=your_google_client_secret_here
 GOOGLE_REDIRECT_URI=http://localhost:3000/auth/google/callback
 ```
 
-### How to Configure Google OAuth 2.0 (Optional for Production):
-1. Go to **Google Cloud Console** -> **APIs & Services** -> **Credentials**.
-2. Create an **OAuth 2.0 Client ID** (Web application type).
-3. Add `http://localhost:3000/auth/google/callback` to **Authorized redirect URIs**.
-4. Enable the **Google Drive API** under **Enabled APIs & Services**.
-5. Copy your **Client ID** and **Client Secret** into `server/.env`.
-
----
-
-## 🏆 10-Step Competition Demonstration Flow
-
-1. **Step 1 — Open Dashboard**: Show primary call-to-action: **🔗 Connect Google Drive**.
-2. **Step 2 — Click Connect Google Drive**: Opens modal with OAuth authentication & `YOUR DATA, YOUR CONTROL` privacy card.
-3. **Step 3 — Select Learning Folder**: Choose `📁 College` (24 learning resources found).
-4. **Step 4 — Sync Knowledge**: Click **Sync Knowledge** to initiate processing.
-5. **Step 5 — Multi-Stage Pipeline**: Visual progress (*Extracting... Identifying concepts... Finding relationships... Updating map*).
-6. **Step 6 — Sync Results**: Displays **24 resources | 86 concepts | 42 connections | 7 learning gaps**.
-7. **Step 7 — Ask My Knowledge**: Query *"Where did I learn about HashSet?"*.
-8. **Step 8 — Origin Citation**: Point out result `Java Collections.pdf — Page 12` with text excerpt match.
-9. **Step 9 — Visual Knowledge Map**: Click **View Knowledge Map** to inspect topology (`Java → Collections → HashSet → Duplicate Removal`).
-10. **Step 10 — Learning Gap Diagnostic**: Open **Learning Gaps** to view `HashMap` at 75% coverage with missing topics (`⚠ Collision handling`, `⚠ Hashing mechanism`).
-
 ---
 
 ## 🚀 How to Run
 
-1. **Backend Server**:
+1. **Start Backend Server**:
    ```bash
    cd server
    npm install
    npm start
    ```
-   *Runs at `http://localhost:5000`*
+   *Runs on `http://localhost:5000`*
 
-2. **Frontend App**:
+2. **Start Frontend Application**:
    ```bash
    cd client
    npm install
    npm run dev
    ```
-   *Runs at `http://localhost:3000`*
+   *Runs on `http://localhost:3000`*
 
 ---
 
-## 🔮 Future Scope
+## 🏆 Demo Mode & Standalone Operation
 
-- OCR integration for handwritten lecture notes and whiteboard photos.
-- Cross-user collaborative knowledge graph sharing for study groups.
-- Vector database semantic search (FAISS / Pinecone) for multi-gigabyte textbook indexing.
-- Mobile application with offline knowledge graph syncing.
-
+MemoryMap operates out of the box in **Demo Mode**:
+- Pre-populated with multi-source sample materials (`Java Collections.pdf`, `DSA_Notes.jpg`, `DSA_Lecture.mp4`, `Java Collections Explained`, `My HashSet Notes`, `DBMS Normalization.pptx`).
+- No external AI API key or Google credentials required for evaluation.
+- All features (Knowledge Map, Ask Engine, Concept Explorer, Learning Gaps) run offline safely.

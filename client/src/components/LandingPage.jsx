@@ -47,14 +47,14 @@ export default function LandingPage({ onExplore }) {
         </div>
 
         <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-white leading-tight font-sans">
-          “You remember the concept.<br />
+          Your learning is scattered.<br />
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-300 to-cyan-400">
-            We find the knowledge.”
+            Your knowledge doesn't have to be.
           </span>
         </h1>
 
         <p className="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto leading-relaxed font-normal">
-          MemoryMap transforms scattered learning materials into a personal, searchable map of knowledge.
+          Connect your Drive, upload your resources, add videos or notes, and let MemoryMap turn everything you learn into one searchable personal knowledge map.
         </p>
 
         {/* Hero CTA Buttons */}
@@ -63,7 +63,7 @@ export default function LandingPage({ onExplore }) {
             onClick={() => onExplore('dashboard')}
             className="w-full sm:w-auto flex items-center justify-center gap-2.5 px-8 py-4 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 text-white font-extrabold text-sm shadow-xl shadow-indigo-600/30 hover:scale-105 transition-all active:scale-95"
           >
-            <span>Explore MemoryMap</span>
+            <span>Start Building My Knowledge</span>
             <ArrowRight className="w-4 h-4" />
           </button>
 
@@ -72,7 +72,7 @@ export default function LandingPage({ onExplore }) {
             className="w-full sm:w-auto flex items-center justify-center gap-2 px-8 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 font-extrabold text-sm border border-slate-700 transition-all"
           >
             <Search className="w-4 h-4 text-indigo-400" />
-            <span>View Demo</span>
+            <span>Explore Demo</span>
           </button>
         </div>
 
@@ -182,6 +182,33 @@ export default function LandingPage({ onExplore }) {
           >
             Launch MemoryMap Workspace
           </button>
+        </div>
+
+        {/* Privacy Section (Section 28 Requirement) */}
+        <div className="glass-panel p-8 rounded-3xl border border-emerald-500/20 bg-emerald-950/10 space-y-4 text-center max-w-3xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-bold">
+            <Lock className="w-3.5 h-3.5" />
+            <span>YOUR LEARNING, YOUR CONTROL</span>
+          </div>
+          <h3 className="text-xl font-bold text-white font-sans">Privacy & Control First</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-slate-300 text-left pt-2">
+            <div className="flex items-center gap-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>You choose what to connect</span>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Select only the learning folder you want</span>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Upload only the resources you need</span>
+            </div>
+            <div className="flex items-center gap-2 bg-slate-900/60 p-3 rounded-xl border border-slate-800">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+              <span>Disconnect Google Drive anytime</span>
+            </div>
+          </div>
         </div>
 
       </section>

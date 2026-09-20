@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { BookOpen, FileText, Presentation, FileCode, Globe, Plus, Search, Calendar, User, Eye, Network, CheckCircle2 } from 'lucide-react';
 
-export default function MaterialsList({ onOpenUpload, onNavigate }) {
+export default function MaterialsList({ onOpenUpload, onNavigate, onCreatePresentation }) {
   const [materials, setMaterials] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDoc, setSelectedDoc] = useState(null);
+  const [sourceFilter, setSourceFilter] = useState('ALL'); // ALL, google_drive, file_upload, image, video, youtube, note
 
   useEffect(() => {
     fetchMaterials();
@@ -24,21 +25,14 @@ export default function MaterialsList({ onOpenUpload, onNavigate }) {
     }
   };
 
-  const getTypeIcon = (type) => {
-    switch (type) {
-      case 'PDF': return <FileText className="w-5 h-5 text-red-400" />;
-      case 'PPT': return <Presentation className="w-5 h-5 text-orange-400" />;
-      case 'Notes': return <FileCode className="w-5 h-5 text-cyan-400" />;
-      case 'Web': return <Globe className="w-5 h-5 text-emerald-400" />;
-      default: return <BookOpen className="w-5 h-5 text-indigo-400" />;
-    }
-  };
-
-  const filteredMaterials = materials.filter(m => 
-    m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    m.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (m.mainTopics || []).some(t => t.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
+  const filteredMaterials = materials.filter(m => {
+    const matchesSearch = m.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      m.course.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (m.mainTopics || []).some(t => t.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    if (sourceFilter === 'ALL') return matchesSearch;
+    return matchesSearch && (m.sourceType === sourceFilter || m.type.toLowerCase() === sourceFilter);
+  });
 
   return (
     <div className="space-y-6">
@@ -78,6 +72,31 @@ export default function MaterialsList({ onOpenUpload, onNavigate }) {
           </button>
         </div>
 
+      </div>
+
+      {/* Section 16: Category Filter Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        {[
+          { id: 'ALL', label: `All Resources (${materials.length})` },
+          { id: 'google_drive', label: '🔗 Google Drive' },
+          { id: 'file_upload', label: '📄 Documents' },
+          { id: 'image', label: '🖼️ Images' },
+          { id: 'video', label: '🎥 Videos' },
+          { id: 'youtube', label: '▶️ YouTube' },
+          { id: 'note', label: '📝 Notes' }
+        ].map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setSourceFilter(tab.id)}
+            className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 border ${
+              sourceFilter === tab.id
+                ? 'bg-indigo-600/30 text-indigo-200 border-indigo-500/50 shadow-sm'
+                : 'bg-slate-900/80 text-slate-400 border-slate-800 hover:text-white'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       {/* Materials Grid (Fulfills Feature F Card Specifications) */}
@@ -149,7 +168,7 @@ export default function MaterialsList({ onOpenUpload, onNavigate }) {
 
                 </div>
 
-                {/* Footer Meta & Action Buttons [View] [Knowledge Map] */}
+                {/* Footer Meta & Action Buttons [View] [Presentation] [Knowledge Map] */}
                 <div className="pt-3 border-t border-white/5 space-y-3">
                   <div className="flex items-center justify-between text-[11px] text-slate-500">
                     <span className="flex items-center gap-1">
@@ -160,22 +179,30 @@ export default function MaterialsList({ onOpenUpload, onNavigate }) {
                     </span>
                   </div>
 
-                  {/* Action Buttons: [View] [Knowledge Map] */}
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Action Buttons */}
+                  <div className="grid grid-cols-3 gap-1.5">
                     <button
                       onClick={() => setSelectedDoc(doc)}
-                      className="py-2 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center justify-center gap-1.5 transition-all border border-slate-700"
+                      className="py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-[11px] font-bold flex items-center justify-center gap-1 transition-all border border-slate-700"
                     >
-                      <Eye className="w-3.5 h-3.5 text-cyan-400" />
+                      <Eye className="w-3 h-3 text-cyan-400" />
                       <span>View</span>
                     </button>
 
                     <button
-                      onClick={() => onNavigate && onNavigate('graph')}
-                      className="py-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-sm"
+                      onClick={() => onCreatePresentation && onCreatePresentation({ topic: doc.title, resourceId: doc.id })}
+                      className="py-1.5 rounded-xl bg-gradient-to-r from-purple-600/40 to-indigo-600/40 hover:from-purple-600 hover:to-indigo-600 text-purple-200 border border-purple-500/40 text-[11px] font-bold flex items-center justify-center gap-1 transition-all"
                     >
-                      <Network className="w-3.5 h-3.5 text-purple-400" />
-                      <span>Knowledge Map</span>
+                      <Presentation className="w-3 h-3 text-cyan-300" />
+                      <span>PPT</span>
+                    </button>
+
+                    <button
+                      onClick={() => onNavigate && onNavigate('graph')}
+                      className="py-1.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 text-[11px] font-bold flex items-center justify-center gap-1 transition-all shadow-sm"
+                    >
+                      <Network className="w-3 h-3 text-purple-400" />
+                      <span>Map</span>
                     </button>
                   </div>
                 </div>
@@ -198,7 +225,7 @@ export default function MaterialsList({ onOpenUpload, onNavigate }) {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">{selectedDoc.title}</h3>
-                  <p className="text-xs text-indigo-300">{selectedDoc.course} • {selectedDoc.pageCount} Pages</p>
+                  <p className="text-xs text-indigo-300">{selectedDoc.course} • {selectedDoc.pageCount || 10} Pages</p>
                 </div>
               </div>
               
@@ -217,10 +244,22 @@ export default function MaterialsList({ onOpenUpload, onNavigate }) {
               </p>
             </div>
 
-            <div className="flex justify-end pt-2">
+            <div className="flex items-center justify-between pt-2 border-t border-white/10">
+              <button
+                onClick={() => {
+                  const doc = selectedDoc;
+                  setSelectedDoc(null);
+                  if (onCreatePresentation) onCreatePresentation({ topic: doc.title, resourceId: doc.id });
+                }}
+                className="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white text-xs font-bold flex items-center gap-2"
+              >
+                <Presentation className="w-4 h-4 text-cyan-300" />
+                <span>Create Presentation From This Resource</span>
+              </button>
+
               <button
                 onClick={() => setSelectedDoc(null)}
-                className="px-5 py-2 rounded-xl bg-indigo-600 text-white text-xs font-bold"
+                className="px-5 py-2 rounded-xl bg-slate-800 text-slate-300 hover:text-white text-xs font-bold"
               >
                 Done Inspecting
               </button>

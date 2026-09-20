@@ -155,10 +155,28 @@ export default function GapAnalyzer({ onNavigate }) {
 
               </div>
 
-              {/* Suggested Next Topic & Learn Next Button */}
+              {/* Suggested Next Topic & Resources */}
               <div className="pt-3 border-t border-white/10 space-y-2">
                 <div className="text-[11px] text-slate-400">
                   Suggested next topic: <strong className="text-white">{item.suggestedNext}</strong>
+                </div>
+
+                {/* Section 15: Suggested Resources to Fill Gaps */}
+                <div className="bg-slate-900/90 p-2.5 rounded-xl border border-slate-800 space-y-1">
+                  <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1">
+                    <BookOpen className="w-3 h-3 text-cyan-400" /> Suggested Gap-Filling Resources:
+                  </span>
+                  <div className="space-y-1 text-[11px] text-slate-300">
+                    <div className="flex items-center gap-1.5">
+                      <span>📄 Hashing Notes.pdf</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>▶️ HashMap Deep Dive (YouTube 12:40)</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span>📝 Advanced Hashing Notes</span>
+                    </div>
+                  </div>
                 </div>
 
                 <button

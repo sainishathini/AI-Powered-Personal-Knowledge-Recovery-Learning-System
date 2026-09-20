@@ -4,6 +4,8 @@ const store = require('../models/store');
 const { extractConcepts, answerFromKnowledge } = require('../services/aiService');
 const { extractConceptsFromMaterial } = require('../services/aiEngine');
 const driveService = require('../services/googleDriveService');
+const processors = require('../services/contentProcessors');
+const presentationService = require('../services/presentationService');
 
 // ==========================================
 // GOOGLE DRIVE OAUTH & INGESTION REST API
@@ -207,16 +209,99 @@ router.post('/materials/upload', async (req, res) => {
     store.addConcepts(formattedConcepts);
 
     res.json({
-      message: 'Material ingested and concepts mapped successfully!',
+      message: 'Material uploaded and processed',
       material: newDoc,
-      extractedCount: formattedConcepts.length,
-      concepts: formattedConcepts,
-      keywords: extractionResult.keywords || formattedConcepts.map(c => c.title),
-      summary: extractionResult.summary || `Indexed ${formattedConcepts.length} concepts.`,
-      relatedConcepts: extractionResult.relatedConcepts || []
+      concepts: formattedConcepts
     });
   } catch (err) {
-    res.status(500).json({ error: 'Failed to process material' });
+    res.status(500).json({ error: 'Failed to upload material' });
+  }
+});
+
+// POST /api/materials/process-image - Process Image / OCR (Section 4)
+router.post('/materials/process-image', async (req, res) => {
+  try {
+    const processed = await processors.processImage(req.body);
+    const newDoc = store.addMaterial({
+      title: req.body.title || 'DSA_Notes.jpg',
+      content: processed.extractedText,
+      type: 'Image',
+      sourceType: 'image',
+      course: req.body.course || 'Data Structures'
+    });
+    store.addConcepts(processed.concepts.map(c => ({ ...c, sourceDocId: newDoc.id, sourceDocTitle: newDoc.title })));
+    res.json({ success: true, material: newDoc, ...processed });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to process image OCR' });
+  }
+});
+
+// POST /api/materials/process-video - Process Video Lecture (Section 5)
+router.post('/materials/process-video', async (req, res) => {
+  try {
+    const processed = await processors.processVideo(req.body);
+    const newDoc = store.addMaterial({
+      title: req.body.title || 'DSA_Lecture.mp4',
+      content: processed.transcript,
+      type: 'Video',
+      sourceType: 'video',
+      course: req.body.course || 'Data Structures'
+    });
+    store.addConcepts(processed.concepts.map(c => ({ ...c, sourceDocId: newDoc.id, sourceDocTitle: newDoc.title })));
+    res.json({ success: true, material: newDoc, ...processed });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to process video transcript' });
+  }
+});
+
+// POST /api/materials/process-youtube - Process YouTube Video URL (Section 6)
+router.post('/materials/process-youtube', async (req, res) => {
+  try {
+    const { url } = req.body;
+    if (!url || typeof url !== 'string' || !url.trim()) {
+      return res.status(400).json({ error: 'Unable to analyze this video. Please check the URL or try another video.' });
+    }
+
+    const processed = await processors.processYouTube(req.body);
+    const tLower = (processed.title || '').toLowerCase();
+    const dynamicCourse = tLower.includes('python') 
+      ? 'Python Programming' 
+      : tLower.includes('dbms') || tLower.includes('database') 
+        ? 'Database Systems' 
+        : tLower.includes('machine learning') 
+          ? 'Artificial Intelligence' 
+          : 'General Computer Science';
+
+    const newDoc = store.addMaterial({
+      title: processed.title,
+      content: processed.transcript,
+      type: 'YouTube',
+      sourceType: 'youtube',
+      sourceUrl: processed.sourceUrl,
+      course: dynamicCourse
+    });
+    store.addConcepts(processed.concepts.map(c => ({ ...c, sourceDocId: newDoc.id, sourceDocTitle: newDoc.title })));
+    res.json({ success: true, material: newDoc, ...processed });
+  } catch (err) {
+    res.status(500).json({ error: 'Unable to analyze this video. Please check the URL or try another video.' });
+  }
+});
+
+// POST /api/materials/process-note - Process Quick Text Note (Section 7)
+router.post('/materials/process-note', async (req, res) => {
+  try {
+    const processed = await processors.processNote(req.body);
+    const newDoc = store.addMaterial({
+      title: req.body.title || 'My HashSet Notes',
+      content: processed.extractedText,
+      type: 'Notes',
+      sourceType: 'note',
+      course: 'Personal Notes'
+    });
+    store.addConcepts(processed.concepts.map(c => ({ ...c, sourceDocId: newDoc.id, sourceDocTitle: newDoc.title })));
+    res.json({ success: true, material: newDoc, ...processed });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to process note' });
   }
 });
 
@@ -305,6 +390,67 @@ router.post('/gaps/quiz/verify', (req, res) => {
     correctAnswerIndex: quiz.correctAnswer,
     explanation: quiz.explanation
   });
+});
+// ==========================================
+// 7. PRESENTATION AI REST API (Section 25)
+// ==========================================
+
+// POST /api/presentations/generate - Generate Presentation & .pptx File
+router.post('/presentations/generate', async (req, res) => {
+  try {
+    const { topic, type, slideCount, resourceIds, language, initialQuery } = req.body;
+    const presentation = await presentationService.generatePresentation({
+      topic,
+      type,
+      slideCount,
+      resourceIds,
+      language,
+      initialQuery
+    });
+    res.json({ success: true, presentation });
+  } catch (err) {
+    console.error('Presentation AI Generation Error:', err);
+    res.status(500).json({ error: 'Failed to generate presentation PowerPoint file.' });
+  }
+});
+
+// GET /api/presentations - List Presentations
+router.get('/presentations', (req, res) => {
+  res.json(store.getAllPresentations());
+});
+
+// GET /api/presentations/:id - Get Single Presentation
+router.get('/presentations/:id', (req, res) => {
+  const pres = store.getPresentationById(req.params.id);
+  if (!pres) return res.status(404).json({ error: 'Presentation not found.' });
+  res.json(pres);
+});
+
+// PUT /api/presentations/:id - Update Slide Text & Regenerate PPTX
+router.put('/presentations/:id', async (req, res) => {
+  try {
+    const updated = await presentationService.updatePresentation(req.params.id, req.body.slides);
+    if (!updated) return res.status(404).json({ error: 'Presentation not found.' });
+    res.json({ success: true, presentation: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update presentation.' });
+  }
+});
+
+// GET /api/presentations/:id/download - Download Real .pptx File
+router.get('/presentations/:id/download', (req, res) => {
+  const pres = store.getPresentationById(req.params.id);
+  if (!pres || !pres.filePath) {
+    return res.status(404).json({ error: 'Presentation file not found.' });
+  }
+
+  const fs = require('fs');
+  if (!fs.existsSync(pres.filePath)) {
+    return res.status(404).json({ error: 'PPTX file does not exist on server filesystem.' });
+  }
+
+  res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.presentationml.presentation');
+  res.download(pres.filePath, pres.fileName || 'Presentation.pptx');
 });
 
 module.exports = router;

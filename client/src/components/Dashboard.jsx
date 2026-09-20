@@ -1,112 +1,134 @@
 import React from 'react';
 import { BookOpen, Brain, Network, AlertTriangle, Search, Plus, Sparkles, Clock, ArrowRight, FileText, CheckCircle2, ChevronRight, Compass, RotateCcw } from 'lucide-react';
 
-export default function Dashboard({ summary, onNavigate, onOpenUpload, onOpenDrive, onSearchQuery }) {
+export default function Dashboard({ summary, onNavigate, onOpenUpload, onOpenDrive, onOpenVideoNotes, onLoadDemoResources }) {
   const stats = summary?.stats || {};
   
-  // Real or demo fallback counts matching prompt example: Resources 24, Concepts 146, Connections 38, Learning Gaps 7
-  const displayMaterials = stats.totalMaterials > 4 ? stats.totalMaterials : 24;
-  const displayConcepts = stats.totalConcepts > 8 ? stats.totalConcepts : 146;
-  const displayConnections = stats.totalRelationships > 6 ? stats.totalRelationships : 38;
-  const displayGaps = stats.criticalGapsCount > 2 ? stats.criticalGapsCount : 7;
+  // Real user knowledge metrics derived directly from stored workspace state
+  const displayMaterials = stats.totalMaterials !== undefined ? stats.totalMaterials : (summary?.recentMaterials?.length || 0);
+  const displayConcepts = stats.totalConcepts !== undefined ? stats.totalConcepts : 0;
+  const displayConnections = stats.totalRelationships !== undefined ? stats.totalRelationships : 0;
+  const displayGaps = stats.criticalGapsCount !== undefined ? stats.criticalGapsCount : 0;
 
-  const recentMaterials = summary?.recentMaterials || [
-    { id: 'd1', title: 'Java Collections.pdf', type: 'PDF', course: 'CS201 - Data Structures', dateAdded: 'Today' },
-    { id: 'd2', title: 'Deep_Learning_Lecture_04_Optimization.pdf', type: 'PDF', course: 'CS701 - Deep Learning', dateAdded: 'Yesterday' },
-    { id: 'd3', title: 'Transformers_Self_Attention_Guide.pptx', type: 'PPT', course: 'CS705 - NLP', dateAdded: '3 days ago' },
-    { id: 'd4', title: 'Data Structures Notes.md', type: 'Notes', course: 'CS201 - Data Structures', dateAdded: '5 days ago' }
-  ];
+  const recentMaterials = summary?.recentMaterials && summary.recentMaterials.length > 0
+    ? summary.recentMaterials
+    : [
+        { id: 'd1', title: 'Java Collections.pdf', type: 'PDF', course: 'CS201 - Data Structures', dateAdded: 'Today' }
+      ];
 
   const recentSearches = summary?.recentSearches || [
-    { query: 'Where did I learn about Vanishing Gradients?', timestamp: '12 mins ago', match: 'Deep_Learning_Lecture_04_Optimization.pdf', confidence: '98%' },
-    { query: 'HashSet duplicate removal', timestamp: '1 hour ago', match: 'Java Collections.pdf', confidence: '99%' }
+    { query: 'Where did I learn about Vanishing Gradients?', timestamp: '12 mins ago', match: 'Deep_Learning_Lecture_04_Optimization.pdf', confidence: '98%' }
   ];
 
   const suggestedTopics = summary?.suggestedTopics || [
-    { title: 'Hashing & Collision Handling', category: 'Java Collections', reason: 'Feature E Learning Gap (75% Progress)', action: 'Learn Next' },
-    { title: 'Sinusoidal Frequency Scaling', category: 'Attention Mechanisms', reason: 'Critical Gap Identified (40% Progress)', action: 'Learn Next' }
+    { title: 'Hashing & Collision Handling', category: 'Java Collections', reason: 'Feature E Learning Gap (75% Progress)', action: 'Learn Next' }
   ];
 
-  // Feature H: Recently Recovered Knowledge
   const recentRecoveredMemory = summary?.recentRecoveredMemory || [
-    { concept: 'HashSet', recoveredFrom: 'Java Collections.pdf', timestamp: '10 mins ago' },
-    { concept: 'Recursion', recoveredFrom: 'Data Structures Notes.md', timestamp: '45 mins ago' },
-    { concept: 'Normalization', recoveredFrom: 'DBMS PPT.pptx', timestamp: '2 hours ago' },
-    { concept: 'Vanishing Gradients', recoveredFrom: 'Deep_Learning_Lecture_04_Optimization.pdf', timestamp: 'Yesterday' }
+    { concept: 'HashSet', recoveredFrom: 'Java Collections.pdf', timestamp: '10 mins ago' }
   ];
 
   return (
     <div className="space-y-6">
-      
-      {/* Primary Dashboard Card: 🔗 Connect Google Drive */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-indigo-500/40 relative overflow-hidden bg-gradient-to-r from-indigo-950/60 via-slate-900 to-purple-950/60 shadow-2xl">
-        
-        {/* Glow Effects */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/15 rounded-full blur-3xl pointer-events-none" />
+      {/* Section 17: ADD KNOWLEDGE 3-Card Layout */}
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <h2 className="text-base font-black text-white font-sans uppercase tracking-tight flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-indigo-400" />
+            ADD KNOWLEDGE SOURCES
+          </h2>
+          <span className="text-xs text-slate-400">Supported: Drive, File Uploads, Video Lectures & Notes</span>
+        </div>
 
-        <div className="relative z-10 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
-            
-            <div className="space-y-3 max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 text-xs font-bold uppercase tracking-wider">
-                <span className="text-sm">🔗</span>
-                <span>Core Knowledge Ingestion Workflow</span>
+          {/* Card 1: 🔗 Connect Google Drive */}
+          <div className="glass-panel p-5 rounded-2xl border border-indigo-500/40 bg-gradient-to-b from-indigo-950/40 to-slate-900/90 space-y-3 hover:border-indigo-400 transition-all flex flex-col justify-between group">
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-xl bg-indigo-600/30 text-indigo-300 border border-indigo-500/40 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">
+                🔗
               </div>
-              
-              <h1 className="text-2xl sm:text-3xl font-black text-white font-sans tracking-tight flex items-center gap-3">
-                <span>🔗 Connect Google Drive</span>
-              </h1>
-
-              <p className="text-slate-200 text-sm sm:text-base font-semibold leading-relaxed">
-                Turn your existing study materials into your personal knowledge map.
+              <h3 className="text-base font-bold text-white font-sans">Connect Google Drive</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Access your selected learning folder and continuously sync its contents.
               </p>
             </div>
 
-            {/* Primary Action Button */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full lg:w-auto">
-              <button
-                onClick={onOpenDrive}
-                className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-indigo-600 via-purple-600 to-cyan-500 hover:from-indigo-500 hover:to-cyan-400 text-white text-xs font-black uppercase tracking-wider shadow-xl shadow-indigo-600/40 transition-all transform hover:scale-[1.03] active:scale-[0.97] flex items-center justify-center gap-2.5"
-              >
-                <span className="text-base">🔗</span>
-                <span>Connect Google Drive</span>
-              </button>
-
-              <button
-                onClick={() => onNavigate('search')}
-                className="px-4 py-3.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all flex items-center justify-center gap-2"
-              >
-                <Search className="w-4 h-4 text-indigo-400" />
-                <span>Ask My Knowledge</span>
-              </button>
-            </div>
-
+            <button
+              onClick={onOpenDrive}
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-xs font-bold shadow-md shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+            >
+              <span>🔗 Connect Drive</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
-          {/* Explanation Banner */}
-          <div className="pt-4 border-t border-white/10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-slate-300 bg-slate-900/60 p-4 rounded-xl border border-slate-800">
-            <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-bold text-xs shrink-0">
-                💡
+          {/* Card 2: 📤 Upload Resources */}
+          <div className="glass-panel p-5 rounded-2xl border border-cyan-500/40 bg-gradient-to-b from-cyan-950/40 to-slate-900/90 space-y-3 hover:border-cyan-400 transition-all flex flex-col justify-between group">
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-xl bg-cyan-600/30 text-cyan-300 border border-cyan-500/40 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">
+                📤
               </div>
-              <span>
-                “Connect a folder containing your learning materials. MemoryMap will organize the knowledge inside it.”
-              </span>
+              <h3 className="text-base font-bold text-white font-sans">Upload Resources</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Upload PDFs, PPTs, DOCs, handwritten notes, or images directly from your computer.
+              </p>
             </div>
 
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] text-slate-500 uppercase font-bold">Secondary Action:</span>
-              <button
-                onClick={onOpenUpload}
-                className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all flex items-center gap-1.5"
-              >
-                <span>📄 Add Individual Resource</span>
-              </button>
-            </div>
+            <button
+              onClick={() => onOpenUpload && onOpenUpload('file')}
+              className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-bold transition-all flex items-center justify-center gap-2 active:scale-95"
+            >
+              <Plus className="w-4 h-4 text-cyan-400" />
+              <span>Upload Files</span>
+            </button>
           </div>
 
+          {/* Card 3: 🎥 Quick Video Notes */}
+          <div className="glass-panel p-5 rounded-2xl border border-purple-500/40 bg-gradient-to-b from-purple-950/40 to-slate-900/90 space-y-3 hover:border-purple-400 transition-all flex flex-col justify-between group">
+            <div className="space-y-2">
+              <div className="w-10 h-10 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40 flex items-center justify-center text-lg font-bold group-hover:scale-105 transition-transform">
+                🎥
+              </div>
+              <h3 className="text-base font-bold text-white font-sans">Quick Video Notes</h3>
+              <p className="text-xs text-slate-400 leading-relaxed">
+                Turn a YouTube lecture into notes, concepts and knowledge.
+              </p>
+            </div>
+
+            <button
+              onClick={() => onOpenVideoNotes ? onOpenVideoNotes() : (onOpenUpload && onOpenUpload('video_notes'))}
+              className="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white text-xs font-bold shadow-md shadow-purple-600/30 transition-all flex items-center justify-center gap-2 active:scale-95"
+            >
+              <Sparkles className="w-4 h-4" />
+              <span>Add Video</span>
+            </button>
+          </div>
+
+        </div>
+
+        {/* Section 19 Requirement: Presentation AI Dashboard Card */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-gradient-to-r from-purple-950/80 via-slate-900 to-indigo-950/80 border border-purple-500/40 rounded-2xl shadow-xl">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-purple-600/30 text-purple-300 border border-purple-500/40 flex items-center justify-center text-lg font-bold">
+              🪄
+            </div>
+            <div className="space-y-0.5">
+              <h3 className="text-sm font-bold text-white font-sans flex items-center gap-2">
+                PRESENTATION AI <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">PPTX Generator</span>
+              </h3>
+              <p className="text-xs text-slate-300">
+                Turn your Google Drive files, PDFs, PPTs, notes, and YouTube lectures directly into a ready-to-present PowerPoint presentation.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={() => onNavigate && onNavigate('presentation_ai')}
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-600 via-indigo-600 to-cyan-500 hover:from-purple-500 hover:to-cyan-400 text-white text-xs font-bold shadow-lg shadow-purple-600/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95"
+          >
+            <span>Create Presentation</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
         </div>
       </div>
 

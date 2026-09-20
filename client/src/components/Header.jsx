@@ -54,34 +54,26 @@ export default function Header({
             </select>
           </div>
 
-          {/* AI Status Badge */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[11px] font-medium text-emerald-400">
-            <Cpu className="w-3.5 h-3.5" />
-            <span>{healthStatus?.mode === 'LIVE_LLM' ? 'Live LLM API' : 'Presentation AI'}</span>
-          </div>
-
-          {/* Competition Demo Mode Button */}
+          {/* Presentation AI Workspace Button */}
           <button
-            onClick={onToggleDemoMode}
+            onClick={() => setActiveTab('presentation_ai')}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all border shadow-sm ${
-              isDemoMode
-                ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-amber-500/20 animate-pulse'
-                : 'bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border-amber-500/30'
+              activeTab === 'presentation_ai'
+                ? 'bg-purple-600/30 text-purple-200 border-purple-500/50 shadow-purple-500/20'
+                : 'bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 border-purple-500/30'
             }`}
-            title="Toggle Competition Demo Walkthrough"
           >
-            <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-            <span>🎯 Demo Mode</span>
+            <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+            <span>Presentation AI</span>
           </button>
 
-          {/* Login / User Avatar */}
+          {/* Student Profile Button */}
           <button
             onClick={onOpenLogin}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 hover:border-indigo-500/40 text-xs text-slate-200 font-semibold transition-all"
-            title="Demo Account Login"
           >
             <User className="w-3.5 h-3.5 text-indigo-400" />
-            <span>{user ? user.name : 'Demo Login'}</span>
+            <span>{user ? user.name : 'Student Account'}</span>
           </button>
 
           {/* Add Knowledge Header Button */}
@@ -93,134 +85,6 @@ export default function Header({
             <span>Add Knowledge</span>
           </button>
         </div>
-      </div>
-
-      {/* Main Navigation Tabs */}
-      <div className="max-w-7xl mx-auto mt-3.5 pt-2 border-t border-white/5 flex items-center justify-between overflow-x-auto">
-        <nav className="flex items-center gap-1 sm:gap-2">
-
-          <button
-            onClick={() => setActiveTab('dashboard')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'dashboard'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <LayoutDashboard className="w-4 h-4 text-cyan-400" />
-            <span>Dashboard</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('add_knowledge')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'add_knowledge'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <PlusCircle className="w-4 h-4 text-emerald-400" />
-            <span>Add Knowledge</span>
-          </button>
-          
-          <button
-            onClick={() => setActiveTab('search')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'search'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <Search className="w-4 h-4 text-indigo-400" />
-            <span>Ask My Knowledge</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('graph')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'graph'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <Network className="w-4 h-4 text-purple-400" />
-            <span>Knowledge Map</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('explorer')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'explorer'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <Compass className="w-4 h-4 text-blue-400" />
-            <span>Concept Explorer</span>
-          </button>
-
-          <button
-            onClick={() => setActiveTab('materials')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'materials'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <BookOpen className="w-4 h-4 text-cyan-400" />
-            <span>Resources</span>
-            {summary?.stats?.totalMaterials > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-slate-800 text-slate-300 font-bold">
-                {summary.stats.totalMaterials}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('gaps')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'gaps'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span>Learning Gaps</span>
-            {summary?.stats?.criticalGapsCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30">
-                {summary.stats.criticalGapsCount}
-              </span>
-            )}
-          </button>
-
-          <button
-            onClick={() => setActiveTab('flashcards')}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-lg text-xs font-semibold transition-all ${
-              activeTab === 'flashcards'
-                ? 'bg-indigo-600/20 text-indigo-300 border border-indigo-500/40 shadow-sm'
-                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/40'
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-pink-400" />
-            <span>Revision Flashcards</span>
-          </button>
-
-        </nav>
-
-        {/* Mastery Overview Badge */}
-        <div className="hidden lg:flex items-center gap-3 pl-4 border-l border-white/10 text-xs">
-          <span className="text-slate-400">Concept Recall Mastery:</span>
-          <div className="flex items-center gap-2">
-            <div className="w-20 bg-slate-800 h-2 rounded-full overflow-hidden border border-slate-700">
-              <div 
-                className="bg-gradient-to-r from-indigo-500 to-cyan-400 h-full rounded-full transition-all duration-500"
-                style={{ width: `${summary?.stats?.averageMastery || 75}%` }}
-              />
-            </div>
-            <span className="font-bold text-indigo-300">{summary?.stats?.averageMastery || 75}%</span>
-          </div>
-        </div>
-
       </div>
     </header>
   );

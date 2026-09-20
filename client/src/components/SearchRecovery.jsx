@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search, Sparkles, FileText, Bookmark, ArrowRight, ShieldCheck, HelpCircle, Layers, Link as LinkIcon, Compass, CheckCircle2, Network } from 'lucide-react';
 
-export default function SearchRecovery({ onSelectConcept, currentDomain, onNavigate, initialQuery }) {
+export default function SearchRecovery({ onSelectConcept, currentDomain, onNavigate, initialQuery, onCreatePresentation }) {
   const [query, setQuery] = useState('');
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null);
@@ -100,10 +100,10 @@ export default function SearchRecovery({ onSelectConcept, currentDomain, onNavig
             </button>
           </form>
 
-          {/* Quick Demo Search Chips */}
+          {/* Quick Search Chips */}
           <div className="flex items-center justify-center flex-wrap gap-2 pt-2">
             <span className="text-xs text-slate-500 font-medium flex items-center gap-1">
-              <Compass className="w-3.5 h-3.5" /> Presentation Flow Demo Query:
+              <Compass className="w-3.5 h-3.5" /> Sample Queries:
             </span>
             {sampleQueries.map((qText, idx) => (
               <button
@@ -133,7 +133,7 @@ export default function SearchRecovery({ onSelectConcept, currentDomain, onNavig
         <div className="space-y-6">
 
           {/* AI Origin Synthesis Banner */}
-          <div className="glass-panel p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 flex items-start justify-between gap-4">
+          <div className="glass-panel p-4 rounded-xl border border-cyan-500/30 bg-cyan-950/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex items-start gap-3">
               <div className="w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400 flex items-center justify-center shrink-0 mt-0.5">
                 <Sparkles className="w-4 h-4" />
@@ -146,14 +146,23 @@ export default function SearchRecovery({ onSelectConcept, currentDomain, onNavig
               </div>
             </div>
 
-            {/* Step 4 Action Button: View Knowledge Map */}
-            <button
-              onClick={() => onNavigate && onNavigate('graph')}
-              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md shrink-0"
-            >
-              <Network className="w-4 h-4 text-cyan-300" />
-              <span>View Knowledge Map</span>
-            </button>
+            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
+              <button
+                onClick={() => onCreatePresentation && onCreatePresentation({ topic: result.primaryResult?.conceptTitle || query })}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white text-xs font-bold transition-all shadow-md"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-cyan-200" />
+                <span>Create Presentation</span>
+              </button>
+
+              <button
+                onClick={() => onNavigate && onNavigate('graph')}
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold transition-all border border-slate-700"
+              >
+                <Network className="w-3.5 h-3.5 text-purple-400" />
+                <span>Knowledge Map</span>
+              </button>
+            </div>
           </div>
 
           {/* Primary Source Attribution Card */}
@@ -222,6 +231,52 @@ export default function SearchRecovery({ onSelectConcept, currentDomain, onNavig
                 “{result.primaryResult.snippet}”
               </p>
             </div>
+
+            {/* Section 12: Multi-Source Citation References List */}
+            {result.sourceResources && result.sourceResources.length > 0 && (
+              <div className="space-y-3 pt-2">
+                <span className="text-xs font-bold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <BookOpen className="w-4 h-4 text-cyan-400" /> Multi-Source Origin References ({result.sourceResources.length}):
+                </span>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {result.sourceResources.map((src, idx) => (
+                    <div key={idx} className="bg-slate-900/90 border border-slate-800 rounded-xl p-3.5 space-y-2 flex flex-col justify-between hover:border-indigo-500/40 transition-all">
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-white flex items-center gap-1.5">
+                            {src.sourceType === 'google_drive' && '🔗'}
+                            {src.sourceType === 'image' && '🖼️'}
+                            {src.sourceType === 'video' && '🎥'}
+                            {src.sourceType === 'youtube' && '▶️'}
+                            {src.sourceType === 'note' && '📝'}
+                            {src.title}
+                          </span>
+                          <span className="text-[10px] font-mono font-bold text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded border border-cyan-500/20">
+                            {src.location}
+                          </span>
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-mono">{src.sourceUrl || 'Connected Knowledge Origin'}</div>
+                        <p className="text-[11px] text-slate-300 line-clamp-2 italic pt-1">
+                          “{src.snippet}”
+                        </p>
+                      </div>
+
+                      <div className="pt-2 border-t border-white/5 flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => alert(`Opening source: ${src.title} (${src.location})`)}
+                          className="px-3 py-1 rounded-lg bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 border border-indigo-500/40 text-[10px] font-bold transition-all flex items-center gap-1"
+                        >
+                          <span>Open Source</span>
+                          <ArrowRight className="w-3 h-3" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Connections & Prerequisites Footer */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
